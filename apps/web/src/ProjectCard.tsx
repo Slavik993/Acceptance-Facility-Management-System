@@ -652,7 +652,11 @@ export function ProjectCard({
         <dl className="deflist__body" aria-labelledby="card-info-head">
         <div className="deflist__row">
           <dt className="deflist__term">Заказчик</dt>
-          <dd className="deflist__value">{project.client.name}</dd>
+          <dd className="deflist__value">
+            <span className="code-badge">{project.client.code}</span>
+            {" — "}
+            {project.client.name}
+          </dd>
         </div>
         <div className="deflist__row">
           <dt className="deflist__term">Реквизиты заказчика</dt>
