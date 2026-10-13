@@ -2194,3 +2194,26 @@ export type Inbox = z.infer<typeof inboxSchema>;
 /** Ответ на отметку захода заказчика: новое мгновение отметки. */
 export const inboxSeenSchema = z.object({ seenAt: z.string() });
 export type InboxSeen = z.infer<typeof inboxSeenSchema>;
+
+/* --- Вкладка «Файлы» объекта (Э7, кандидат) ---------------------------- */
+
+/**
+ * Файл объекта: сканы, договоры, фотографии вне приёмки.
+ *
+ * Ключ файла собирает сервер, от клиента не приходит. Тип определяется
+ * по первым байтам (SVG не принимается).
+ */
+export const projectFileSchema = z.object({
+  id: z.string().uuid(),
+  fileName: z.string(),
+  contentType: z.string(),
+  byteSize: z.number().int().nonnegative(),
+  uploadedAt: z.string(),
+  description: z.string().nullable(),
+});
+export type ProjectFile = z.infer<typeof projectFileSchema>;
+
+export const createProjectFileSchema = z.object({
+  description: z.string().max(500).optional().nullable(),
+});
+export type CreateProjectFile = z.infer<typeof createProjectFileSchema>;

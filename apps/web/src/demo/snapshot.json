@@ -14173,12 +14173,38 @@
    }
   ],
   "totals": {
-   "works": "500000",
-   "supervisionShare": 1200,
-   "supervision": "60000",
-   "total": "560000",
-   "wage": "250000",
-   "profit": "250000"
-  }
- }
+    "works": "500000",
+    "supervisionShare": 1200,
+    "supervision": "60000",
+    "total": "560000",
+    "wage": "250000",
+    "profit": "250000"
+   }
+  },
+  "files": [
+   {
+    "id": "f0a1b2c3-0001-4000-8000-000000000001",
+    "fileName": "Смета Московский проспект 116.jpg",
+    "contentType": "image/jpeg",
+    "byteSize": 184320,
+    "uploadedAt": "2026-09-08T10:15:00.000Z",
+    "description": "Исходный файл сметы"
+   },
+   {
+    "id": "f0a1b2c3-0002-4000-8000-000000000002",
+    "fileName": "Акт № 1 подписанный.png",
+    "contentType": "image/png",
+    "byteSize": 92160,
+    "uploadedAt": "2026-10-01T14:20:00.000Z",
+    "description": "Скан подписанного экземпляра"
+   },
+   {
+    "id": "f0a1b2c3-0003-4000-8000-000000000003",
+    "fileName": "Фасад до начала работ.webp",
+    "contentType": "image/webp",
+    "byteSize": 45056,
+    "uploadedAt": "2026-09-15T09:05:00.000Z",
+    "description": null
+   }
+  ]
 }

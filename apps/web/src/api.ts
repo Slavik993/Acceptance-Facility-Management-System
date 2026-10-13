@@ -1,6 +1,6 @@
 import type {
   CurrentUser, DocumentTemplate, Inbox, InboxSeen, InviteIssued, InviteUser, IssuedDocument, PersonRow,
-  ProjectSummary, SaveTemplate, TemplateRow,
+  ProjectSummary, ProjectFile, SaveTemplate, TemplateRow,
 } from "@priyomka/contracts";
 import {
   clientRowSchema, closedTranchesSchema, currentUserSchema, dashboardSchema, estimateViewSchema, eventSchema,
@@ -11,7 +11,7 @@ import {
   documentTemplateSchema, issuedDocumentSchema, templateRowSchema,
   inviteIssuedSchema, personRowSchema, inboxSchema, inboxSeenSchema,
   leadCardSchema, measureViewSchema, repairTypeSchema,
-  organizationSchema, projectFactsSchema, projectSummarySchema, smsCodeIssuedSchema, unitSchema, workerRowSchema,
+  organizationSchema, projectFactsSchema, projectFileSchema, projectSummarySchema, smsCodeIssuedSchema, unitSchema, workerRowSchema,
   workStageSchema, acceptanceViewSchema, trancheViewSchema, accountingViewSchema,
   type AcceptanceView, type CreateAcceptance, type Reversal,
   type CloseTranche, type CreatePayment, type CreateTranche, type TrancheView,
@@ -26,7 +26,7 @@ import {
   type BlueprintRow, type BlueprintView, type CreateBlueprint,
   type MoveEstimateItem, type UpdateEstimateItem, type UpdateSupervision,
   type CreateEstimateItem, type CreateEstimateSection, type RenameEstimateSection, type ProjectFacts,
-  type UpdateProject, type Foreman,
+  type UpdateProject, type Foreman, type ProjectFile,
   type UpdateWorkStage, type WorkerRow, type WorkStage,
   type ConvertLead, type CreateLead, type CreateLeadTask, type CreateRepairType,
   type LeadBoard, type LeadCard, type LoseLead, type PhotoReport, type RepairType,
@@ -699,3 +699,33 @@ export const createRepairType = (input: CreateRepairType): Promise<RepairType[]>
 
 export const updateRepairType = (id: string, input: UpdateRepairType): Promise<RepairType[]> =>
   request(`/repair-types/${id}`, z.array(repairTypeSchema), patch(input));
+
+/* --- Вкладка «Файлы» объекта (Э7, кандидат) ---------------------------- */
+
+const filesSchema = z.array(projectFileSchema);
+
+export const fetchFiles = (code: string): Promise<ProjectFile[]> =>
+  request(`/projects/${code}/files`, filesSchema);
+
+export const uploadFile = (
+  code: string,
+  file: File,
+  description?: string | null,
+): Promise<ProjectFile[]> => {
+  const formData = new FormData();
+  formData.append("attachment", file, file.name);
+  if (description !== null && description !== undefined) {
+    formData.append("description", description);
+  }
+  return request(`/projects/${code}/files`, filesSchema, {
+    method: "POST",
+    body: formData,
+  });
+};
+
+export const deleteFile = (code: string, id: string): Promise<ProjectFile[]> =>
+  request(`/projects/${code}/files/${id}`, filesSchema, { method: "DELETE" });
+
+/** URL файла: отдаётся сервером с того же источника, кука уходит браузером сама. */
+export const fileUrl = (code: string, fileId: string): string =>
+  `/api/projects/${code}/files/${fileId}/file`;

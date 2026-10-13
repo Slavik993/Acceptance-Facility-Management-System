@@ -2856,3 +2856,23 @@ button.score:hover { border-block-start-color: var(--accent); color: var(--accen
 @media (max-width: 480px) {
   .statrow { grid-template-columns: 1fr 1fr; }
 }
+
+/* --- Файлы объекта (Э7, кандидат) ---------------------------------------
+   Список файлов карточки объекта. На широком экране — таблица
+   (.table); до 480 px — строки-карточки, как прочие ведомости:
+   имя, дата и размер в телефон не влезали одной строкой. Вид
+   переключает разметка (`useNarrow`), а не стили. */
+.filelist { margin: 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; gap: var(--space-3); }
+.filelist__item {
+  display: flex; flex-direction: column; gap: var(--space-1);
+  padding: var(--space-3); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+}
+.filelist__link { display: inline-flex; align-items: center; gap: var(--space-2);
+  min-inline-size: 0; color: var(--accent); font-weight: 500;
+  overflow-wrap: anywhere; }
+.filelist__icon { flex: none; }
+.filelist__meta { font-size: var(--fs-sm); color: var(--ink-3); }
+.filelist__desc { font-size: var(--fs-sm); color: var(--ink-2); }
+.filelist__acts { display: flex; gap: var(--space-2); margin-block-start: var(--space-1); }

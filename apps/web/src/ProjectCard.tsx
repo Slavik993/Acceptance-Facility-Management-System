@@ -35,6 +35,7 @@ import { BlueprintSheet } from "./BlueprintSheet.js";
 import { EstimateItemSheet } from "./EstimateItemSheet.js";
 import { SupervisionSheet } from "./SupervisionSheet.js";
 import { StatusSheet } from "./StatusSheet.js";
+import { Files } from "./Files.js";
 import { waitingTurn } from "./turn.js";
 import { tabArrowHandler } from "./tabs.js";
 import type { Вкладка, ОтборАдреса } from "./route.js";
@@ -201,6 +202,7 @@ const TABS = [
   { key: "report", label: "Отчёт" },
   { key: "tranches", label: "Транши" },
   { key: "documents", label: "Документы" },
+  { key: "files", label: "Файлы" },
 ] as const;
 
 type Tab = (typeof TABS)[number]["key"] | "import";
@@ -384,7 +386,7 @@ export function ProjectCard({
      Состав повторяет разметку маршрутов сервера, но её не заменяет:
      спрятанная вкладка — это удобство, а не запрет. Запрет стоит в страже
      ролей, где заказчику закрыто всё, что не названо прямо. */
-  const ЗАКАЗЧИКУ: readonly Tab[] = ["overview", "work", "estimate", "report", "documents"];
+  const ЗАКАЗЧИКУ: readonly Tab[] = ["overview", "work", "estimate", "report", "documents", "files"];
   const tabList = ownerLevel(user.role)
     ? [...TABS, { key: "import" as const, label: "Импорт" }]
     : user.role === "CLIENT"
@@ -905,6 +907,10 @@ export function ProjectCard({
               {tab === "documents" && (
                 <Acts code={project.code} role={user.role} отбор={отбор} onСброситьОтбор={onСброситьОтбор} />
               )}
+            </div>
+
+            <div role="tabpanel" id="panel-files" aria-labelledby="tab-files" hidden={tab !== "files"}>
+              {tab === "files" && <Files code={project.code} role={user.role} />}
             </div>
 
             <div role="tabpanel" id="panel-report" aria-labelledby="tab-report" hidden={tab !== "report"}>

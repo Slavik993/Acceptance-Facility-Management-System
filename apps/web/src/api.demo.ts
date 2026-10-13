@@ -18,7 +18,7 @@ import type {
   BlueprintRow, BlueprintView, CreateBlueprint,
   DocumentClause, DocumentTemplate, IssuedDocument, SaveTemplate, TemplateKind, TemplateRow,
   InviteIssued, InviteUser, PersonRow, Inbox, InboxItem, InboxKind, InboxSeen,
-  ImportResult, MeasureRoom, MeasureSetKind, MeasureView, Organization, ProjectEvent, ProjectStatus, ProjectSummary, UpdateProject, Foreman,
+  ImportResult, MeasureRoom, MeasureSetKind, MeasureView, Organization, ProjectEvent, ProjectStatus, ProjectSummary, UpdateProject, Foreman, ProjectFile,
   CreateClient, CreateProject, CreateWorker,
   SmsCodeIssued, Unit, UpdateMeasureRoom, UpdateWorkStage, WorkerRow, WorkStage, CreateWorkStage,
   AcceptanceView, CreateAcceptance, Reversal,
@@ -106,6 +106,8 @@ interface Snapshot {
   "inbox-accountant": Inbox;
   "inbox-foreman": Inbox;
   "inbox-client": Inbox;
+  /** Файлы объекта R-99: вкладка «Файлы» (Э7, кандидат). */
+  files: ProjectFile[];
 }
 
 const data = snapshot as unknown as Snapshot;
@@ -2456,6 +2458,86 @@ export async function attachActScan(_code: string, trancheId: string, file: File
 
 export const actScanUrl = (_code: string, trancheId: string): string =>
   сканы.get(trancheId)?.адрес ?? "";
+
+/* --- файлы объекта (Э7, кандидат) ---------------------------------
+   Список — снимок стенда для R-99; файлы, загруженные в
+   демонстрации, живут в памяти вкладки до перезагрузки:
+   сервера, который сохранил бы содержимое, у демонстрации
+   нет. Тип берётся из того, что назвал браузер: содержимое
+   читать нечем, но отказ демонстрации обязан быть тем же, что
+   на сервере, — иначе она приняла бы то, что продукт
+   отвергнет. */
+
+/** Файлы, загруженные в демонстрации: код объекта → список. */
+const файлыДемо = new Map<string, ProjectFile[]>();
+
+/** Опознаватель файла → его адрес (object URL браузера). */
+const адресаФайлов = new Map<string, string>();
+
+/** Файлы со стенда, удалённые в демонстрации: слепок не меняется,
+    но список обязан их больше не показывать. */
+const удалённыеФайлы = new Set<string>();
+
+export async function fetchFiles(code: string): Promise<ProjectFile[]> {
+  await pause(120);
+  const снятые = code === "R-99"
+    ? data.files.filter((файл) => !удалённыеФайлы.has(файл.id))
+    : [];
+  return [...снятые, ...(файлыДемо.get(code) ?? [])];
+}
+
+export async function uploadFile(
+  code: string,
+  file: File,
+  description?: string | null,
+): Promise<ProjectFile[]> {
+  await pause(260);
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    throw new Error(
+      "Принимается изображением: image/jpeg, image/png, image/webp. "
+      + "Тип определяется по содержимому файла.",
+    );
+  }
+  const загруженные = файлыДемо.get(code) ?? [];
+  const запись: ProjectFile = {
+    id: новыйId(),
+    fileName: file.name,
+    contentType: file.type,
+    byteSize: file.size,
+    uploadedAt: new Date().toISOString(),
+    description: description ?? null,
+  };
+  загруженные.unshift(запись);
+  файлыДемо.set(code, загруженные);
+  адресаФайлов.set(запись.id, URL.createObjectURL(file));
+  return [...(code === "R-99"
+    ? data.files.filter((файл) => !удалённыеФайлы.has(файл.id))
+    : []), ...загруженные];
+}
+
+export async function deleteFile(code: string, id: string): Promise<ProjectFile[]> {
+  await pause(200);
+  const загруженные = файлыДемо.get(code);
+  if (загруженные !== undefined) {
+    const где = загруженные.findIndex((файл) => файл.id === id);
+    if (где >= 0) {
+      const [удалённый] = загруженные.splice(где, 1);
+      const адрес = адресаФайлов.get(удалённый.id);
+      if (адрес !== undefined) URL.revokeObjectURL(адрес);
+      адресаФайлов.delete(удалённый.id);
+    }
+  }
+  /* Файл со стенда: удаление в демонстрации не может изменить
+     слепок, но список обязан его больше не показывать — иначе
+     действие выглядело бы сломанным. */
+  удалённыеФайлы.add(id);
+  return await fetchFiles(code);
+}
+
+/** Адрес файла: загруженный в демонстрации отдаёт object URL,
+    файл со стенда — заготовку: содержимого в слепке нет. */
+export const fileUrl = (_code: string, fileId: string): string =>
+  адресаФайлов.get(fileId) ?? ЗАГОТОВКА_СНИМКА;
 
 /* --- шаблоны документов организации ------------------------------------------
    Демонстрация правится в памяти вкладки и снимком не переживает перезагрузку:
