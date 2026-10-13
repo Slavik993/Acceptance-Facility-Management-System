@@ -65,6 +65,7 @@ export function StageSheet({
   onMove,
   onDelete,
   onClose,
+  cascade,
 }: {
   stage: WorkStage | null;
   range: ProjectRange;
@@ -74,10 +75,11 @@ export function StageSheet({
   brigades: readonly WorkerRow[];
   busy: boolean;
   error: string | null;
-  onSave: (stage: CreateWorkStage) => void;
+  onSave: (stage: CreateWorkStage & { cascade?: boolean }) => void;
   onMove: ((place: number) => void) | null;
   onDelete: (() => void) | null;
   onClose: () => void;
+  cascade: boolean;
 }): React.JSX.Element {
   const { dialog, first } = useModalDialog<HTMLInputElement>(onClose);
   const [name, setName] = useState(stage?.name ?? "");
@@ -104,6 +106,7 @@ export function StageSheet({
       progress: points,
       sectionId: sectionId === "" ? null : sectionId,
       brigadeId: brigadeId === "" ? null : brigadeId,
+      cascade,
     });
   };
 
@@ -248,19 +251,39 @@ export function StageSheet({
             </p>
 
             {onMove !== null && (
-              <label className="field">
-                <span className="field__label">Место в графике</span>
-                <select
-                  className="input"
-                  value={place}
-                  disabled={busy}
-                  onChange={(event) => { onMove(Number(event.target.value)); }}
-                >
-                  {[...Array(places).keys()].map((index) => index + 1).map((number) => (
-                    <option key={number} value={number}>{number}</option>
-                  ))}
-                </select>
-              </label>
+            <label className="field">
+              <span className="field__label">Место в графике</span>
+              <select
+                className="input"
+                value={place}
+                disabled={busy}
+                onChange={(event) => { onMove(Number(event.target.value)); }}
+              >
+                {[...Array(places).keys()].map((index) => index + 1).map((number) => (
+                  <option key={number} value={number}>{number}</option>
+                ))}
+              </select>
+            </label>
+
+            {/* Каскадный сдвиг (Э7, кандидат): при правке дат все последующие
+                этапы сдвигаются на ту же разницу. */}
+            <label className="toggle" aria-label="Каскадный сдвиг">
+              <span className="toggle__track"><span className="toggle__knob" /></span>
+              <span className="toggle__name">Каскадный сдвиг</span>
+              <input
+                type="checkbox"
+                role="switch"
+                aria-checked={cascade}
+                checked={cascade}
+                onChange={(event) => { /* управляется родителем */ }}
+                tabIndex={-1}
+              />
+            </label>
+            <p className="field__hint">
+              {cascade
+                ? "Все последующие этапы сдвинутся на ту же разницу дат"
+                : "Сдвинется только этот этап"}
+            </p>
             )}
 
             {fault !== null && <p className="field__error" role="alert">{fault}</p>}

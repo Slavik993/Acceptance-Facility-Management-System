@@ -152,6 +152,9 @@ export function Schedule({
   const [объявление, setОбъявление] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ stage: WorkStage | null } | null>(null);
   const [planning, setPlanning] = useState(false);
+  /* Каскадный сдвиг (Э7, кандидат): при правке дат все последующие этапы
+     сдвигаются на ту же разницу. Переключатель в шапке листа правки. */
+  const [каскад, setКаскад] = useState(false);
   /* Справочник бригад тянется здесь, а не приходит сверху: он нужен одному
      листу этого экрана. Отказ справочника не мешает править сроки, поэтому
      пустой список — не ошибка экрана, а отсутствие получателей. */
@@ -362,8 +365,8 @@ export function Schedule({
         </>)}
         {editable && свободные.length > 0 && (
           /* Показывается, только когда есть что раскладывать. Погашенная
-             кнопка не объясняет, почему она погашена, а исчезнувшая хотя бы
-             не обещает действия, которого нет. */
+              кнопка не объясняет, почему она погашена, а исчезнувшая хотя бы
+              не обещает действия, которого нет. */
           <button type="button" className="btn btn--secondary" onClick={() => { setPlanning(true); }}>
             <svg className="icon" aria-hidden="true"><use href="#i-estimate" /></svg>
             График из сметы
@@ -374,6 +377,19 @@ export function Schedule({
             <svg className="icon" aria-hidden="true"><use href="#i-plus" /></svg>
             {завести("этап")}
           </button>
+        )}
+        {editable && stages.length > 0 && (
+          <label className="toggle" aria-label="Каскадный сдвиг">
+            <span className="toggle__track"><span className="toggle__knob" /></span>
+            <span className="toggle__name">Каскад</span>
+            <input
+              type="checkbox"
+              role="switch"
+              aria-checked={каскад}
+              checked={каскад}
+              onChange={(event) => { setКаскад(event.target.checked); }}
+            />
+          </label>
         )}
       </div>
     </div>
@@ -572,7 +588,8 @@ export function Schedule({
           brigades={brigades}
           busy={busy}
           error={sheetError}
-          onSave={(stage: CreateWorkStage) => {
+          cascade={каскад}
+          onSave={(stage: CreateWorkStage & { cascade?: boolean }) => {
             run(editing.stage === null
               ? createStage(code, stage)
               : updateStage(code, editing.stage.id, stage),

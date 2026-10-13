@@ -1269,6 +1269,29 @@ export async function updateStage(
   };
   проверитьДаты(next);
   этапы = список.map((existing) => (existing.id === id ? next : existing));
+
+  // Каскадный сдвиг (Э7, кандидат)
+  const cascade = stage.cascade ?? false;
+  if (cascade && stage.startsOn !== undefined) {
+    const oldStart = new Date(`${прежний.startsOn}T00:00:00Z`);
+    const newStart = new Date(`${stage.startsOn}T00:00:00Z`);
+    const delta = Math.round((newStart.getTime() - oldStart.getTime()) / (1000 * 60 * 60 * 24));
+    if (delta !== 0) {
+      const found = список.findIndex((s) => s.id === id);
+      for (let i = found + 1; i < список.length; i++) {
+        const s = список[i];
+        const oldStartS = new Date(`${s.startsOn}T00:00:00Z`);
+        const oldEndS = new Date(`${s.endsOn}T00:00:00Z`);
+        oldStartS.setDate(oldStartS.getDate() + delta);
+        oldEndS.setDate(oldEndS.getDate() + delta);
+        const idx = этапы.findIndex((e) => e.id === s.id);
+        if (idx !== -1) {
+          этапы[idx] = { ...список[i], startsOn: oldStartS.toISOString().slice(0, 10), endsOn: oldEndS.toISOString().slice(0, 10) };
+        }
+      }
+    }
+  }
+
   перенестиСвязиВПриёмку();
   return этапыR99();
 }

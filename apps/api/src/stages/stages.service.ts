@@ -6,7 +6,7 @@ import {
   acceptedQty, acceptedShare, acceptedTotal, formatDay, kopecks, milliunits,
   planFromSections, projectRange, stageDateFault,
   type ProjectRange, type SectionWeight,
-  сколько,
+  сколько, daysBetween, shiftDay,
 } from "@priyomka/domain";
 import { PrismaService } from "../prisma.service";
 import { AuditService } from "../common/audit.service";
@@ -518,6 +518,10 @@ export class StagesService {
       сроки.split(" — ").map(formatDay).join(" — ");
     const этап = input.name ?? прежний.name;
 
+    // Каскадный сдвиг (Э7, кандидат): разница дат правимого этапа.
+    const cascade = input.cascade ?? false;
+    const delta = cascade ? daysBetween(прежний.startsOn.toISOString().slice(0, 10), startsOn) : 0;
+
     await this.prisma.$transaction(async (tx) => {
       await tx.workStage.update({
         where: { id },
@@ -578,6 +582,34 @@ export class StagesService {
           oldValue: `${String(прежний.progress / 100)} %`,
           newValue: `${String(input.progress / 100)} %`,
         }, tx);
+      }
+
+      // Каскадный сдвиг последующих этапов.
+      if (cascade && delta !== 0) {
+        const allStages = await tx.workStage.findMany({
+          where: { projectId: project.id },
+          orderBy: { order: "asc" },
+          select: { id: true, startsOn: true, endsOn: true, name: true },
+        });
+        const found = allStages.findIndex((s) => s.id === id);
+        for (let i = found + 1; i < allStages.length; i++) {
+          const s = allStages[i];
+          const newStart = shiftDay(s.startsOn.toISOString().slice(0, 10), delta);
+          const newEnd = shiftDay(s.endsOn.toISOString().slice(0, 10), delta);
+          await tx.workStage.update({
+            where: { id: s.id },
+            data: { startsOn: new Date(newStart), endsOn: new Date(newEnd) },
+          });
+          await this.audit.record({
+            orgId: user.orgId,
+            actorId: user.id,
+            entity: "WorkStage",
+            entityId: s.id,
+            field: `сроки этапа «${s.name}» (каскад)`,
+            oldValue: дляЖурнала(`${iso(s.startsOn)} — ${iso(s.endsOn)}`),
+            newValue: дляЖурнала(`${newStart} — ${newEnd}`),
+          }, tx);
+        }
       }
     });
 

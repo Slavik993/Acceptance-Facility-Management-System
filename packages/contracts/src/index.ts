@@ -221,7 +221,15 @@ export const createWorkStageSchema = z.object({
 });
 export type CreateWorkStage = z.infer<typeof createWorkStageSchema>;
 
-export const updateWorkStageSchema = createWorkStageSchema.partial();
+export const updateWorkStageSchema = createWorkStageSchema.partial().extend({
+  /**
+   * Каскадный сдвиг (Э7, кандидат).
+   *
+   * При `true` все последующие этапы сдвигаются на ту же разницу дат, что
+   * и правимый. По умолчанию `false` — сдвигается только один этап.
+   */
+  cascade: z.boolean().optional(),
+});
 export type UpdateWorkStage = z.infer<typeof updateWorkStageSchema>;
 
 /**

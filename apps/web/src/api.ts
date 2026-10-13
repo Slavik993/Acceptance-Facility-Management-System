@@ -420,7 +420,7 @@ export const updateStage = (
   request(`/projects/${code}/stages/${id}`, stagesSchema, {
     method: "PATCH",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(stage),
+    body: JSON.stringify({ ...stage, cascade: stage.cascade ?? false }),
   });
 
 export const deleteStage = (code: string, id: string): Promise<WorkStage[]> =>
