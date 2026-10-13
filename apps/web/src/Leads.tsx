@@ -10,6 +10,23 @@ import { formatDate, plural } from "./status.js";
 import { tabArrowHandler } from "./tabs.js";
 
 /**
+ * Поиск по воронке заявок (Э7, кандидат).
+ *
+ * Ищет по номеру, имени и телефону заявки. Без учёта регистра и
+ * лишних пробелов. Фильтр «Открытые / Все» действует поверх поиска.
+ */
+const ищет = (карточка: LeadCard, запрос: string): boolean => {
+  if (запрос === "") return true;
+  const q = запрос.toLowerCase().replace(/\s+/gu, " ").trim();
+  const поле = (v: string | null): string => (v ?? "").toLowerCase().replace(/\s+/gu, " ").trim();
+  return (
+    поле(String(карточка.number)).includes(q) ||
+    поле(карточка.name).includes(q) ||
+    поле(карточка.phone).includes(q)
+  );
+};
+
+/**
  * Доска воронки заявок.
  *
  * Колонки показываются все четыре, даже пустые: колонка, исчезающая вместе
@@ -24,12 +41,14 @@ import { tabArrowHandler } from "./tabs.js";
 export function Leads({ onOpenProject }: { onOpenProject: (code: string) => void }): React.JSX.Element {
   const [board, setBoard] = useState<LeadBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [openOnly, setOpenOnly] = useState(true);
+  const [openOnly, setOpenOpenly] = useState(true);
   const [current, setCurrent] = useState<LeadStage>("FIRST_CONTACT");
   const [opened, setOpened] = useState<LeadCard | null>(null);
   const [adding, setAdding] = useState(false);
-  /** Что именно только что заведено. Подтверждение действия — сама запись. */
+  /** Что именно только что заведено. Подтверждением служит сама запись. */
   const [заведена, setЗаведена] = useState<string | null>(null);
+  /** Поиск по номеру, имени или телефону (Э7, кандидат). */
+  const [запрос, setЗапрос] = useState("");
   const mobile = useMediaQuery(MOBILE);
 
   const load = useCallback(() => {
@@ -53,6 +72,16 @@ export function Leads({ onOpenProject }: { onOpenProject: (code: string) => void
   }
 
   const колонки = board.columns;
+
+  /* Поиск действует поверх фильтра «Открытые / Все»: сперва отбор по
+      статусу, затем — по тексту запроса. */
+  const отфильтрованы = (leads: readonly LeadCard[]): LeadCard[] =>
+    leads.filter((lead) => ищет(lead, запрос));
+
+  const всегоНайдено = board === null
+    ? 0
+    : board.columns.reduce((total, col) => total + отфильтрованы(col.leads).length, 0);
+
   const выбранная = колонки.find((column) => column.stage === current) ?? колонки[0];
 
   /* Обновление после правки листа: карточка приходит целиком, но доска
@@ -68,21 +97,39 @@ export function Leads({ onOpenProject }: { onOpenProject: (code: string) => void
           <svg className="icon" aria-hidden="true"><use href="#i-plus" /></svg>
           {завести("заявка")}
         </button>
-        <label className="selectwrap">
-          <span className="visually-hidden">Показывать заявки</span>
-          <select
-            id="leads-scope"
-            className="input"
-            value={openOnly ? "open" : "all"}
-            onChange={(event) => { setOpenOnly(event.target.value === "open"); }}
-          >
-            <option value="open">Открытые — {board.totals.open}</option>
-            <option value="all">
-              Все — {board.totals.open + board.totals.won + board.totals.lost}
-            </option>
-          </select>
-          <svg className="icon selectwrap__chevron" aria-hidden="true"><use href="#i-chevron" /></svg>
-        </label>
+        <div className="row row--wrap" style={{ gap: "var(--space-2)" }}>
+          <label className="field" style={{ flex: "1 1 160px", minWidth: "0" }}>
+            <span className="field__label">Поиск</span>
+            <input
+              className="input"
+              type="search"
+              placeholder="Номер, имя, телефон"
+              value={запрос}
+              onChange={(event) => { setЗапрос(event.target.value); }}
+              autoComplete="off"
+            />
+            {запрос !== "" && (
+              <span className="field__hint">
+                найдено {всегоНайдено} {plural(всегоНайдено, "заявка", "заявки", "заявок")}
+              </span>
+            )}
+          </label>
+          <label className="selectwrap">
+            <span className="visually-hidden">Показывать заявки</span>
+            <select
+              id="leads-scope"
+              className="input"
+              value={openOnly ? "open" : "all"}
+              onChange={(event) => { setOpenOpenly(event.target.value === "open"); }}
+            >
+              <option value="open">Открытые — {board.totals.open}</option>
+              <option value="all">
+                Все — {board.totals.open + board.totals.won + board.totals.lost}
+              </option>
+            </select>
+            <svg className="icon selectwrap__chevron" aria-hidden="true"><use href="#i-chevron" /></svg>
+          </label>
+        </div>
       </div>
 
       {заведена !== null && (
@@ -127,26 +174,26 @@ export function Leads({ onOpenProject }: { onOpenProject: (code: string) => void
               пустоту, и чтение с экрана объявляет выбор, за которым ничего
               не стоит. */}
           <div id="leads-stage-panel" role="tabpanel">
-            <Column leads={выбранная?.leads ?? []} opened={opened} onOpen={setOpened} />
+            <Column leads={отфильтрованы(выбранная?.leads ?? [])} opened={opened} onOpen={setOpened} />
           </div>
         </>
       ) : (
         <div className="leadboard">
-          {колонки.map((column) => (
-            <section key={column.stage} className="leadboard__column">
-              {/* Черта под заголовком нейтральная у всех четырёх стадий.
-                  Макет красил её сигнальными цветами, но `--danger` в этом
-                  продукте закреплён за сторно, просрочкой и расхождением, и
-                  на карточках под чертой стоит красная пилюля просрочки:
-                  один цвет означал бы разное в двух сантиметрах друг от
-                  друга. Положение в воронке называет порядок колонок. */}
-              <p className="leadboard__title t-cap">{column.label}</p>
-              <p className="leadboard__count t-sm t-muted">
-                {column.leads.length} {plural(column.leads.length, "заявка", "заявки", "заявок")}
-              </p>
-              <Column leads={column.leads} opened={opened} onOpen={setOpened} />
-            </section>
-          ))}
+          {колонки.map((column) => {
+            const найденные = отфильтрованы(column.leads);
+            return (
+              <section key={column.stage} className="leadboard__column">
+                <p className="leadboard__title t-cap">{column.label}</p>
+                <p className="leadboard__count t-sm t-muted">
+                  {column.leads.length} {plural(column.leads.length, "заявка", "заявки", "заявок")}
+                  {запрос !== "" && (
+                    <span className="t-muted"> · найдено {найденные.length}</span>
+                  )}
+                </p>
+                <Column leads={найденные} opened={opened} onOpen={setOpened} />
+              </section>
+            );
+          })}
         </div>
       )}
 

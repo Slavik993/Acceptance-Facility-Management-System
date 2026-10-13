@@ -1730,6 +1730,8 @@ button.appbar__link { gap: var(--space-1); border: 0; background: none;
    её жильца, кнопка и отбор, обведены сами по своей роли, и коробка вокруг
    них ничего не добавляла. */
 .leads__head { padding-block: var(--space-2); gap: var(--space-4); }
+/* Поиск: поле ввода с подсказкой «найдено N» (Э7, кандидат). */
+.leads__head .field { flex: 1 1 160px; min-inline-size: 0; }
 .leadboard { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-5); align-items: start; }
 .leadboard__column { display: flex; flex-direction: column; gap: var(--space-1); min-inline-size: 0; }
