@@ -42,6 +42,7 @@ import { Queue } from "./Queue.js";
 import { STATUS_LABEL, STATUS_PILL, formatDate, plural } from "./status.js";
 import { КРУПНАЯ_ОБЛОЖКА } from "./coverTone.js";
 import { due, type DueLevel } from "./due.js";
+import { PersonSheet } from "./PersonSheet.js";
 
 const money = (value: string): string => formatKopecks(BigInt(value));
 
@@ -243,6 +244,8 @@ export function ProjectCard({
   const [loading, setLoading] = useState(true);
   const [statusOpen, setStatusOpen] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
+  /* Лист «Новый человек» (этап Э8, ДР-11): шаг «Вход заказчику» */
+  const [personOpen, setPersonOpen] = useState(false);
   /* Правка сметы. Обмер и справочник единиц грузятся вместе со сметой:
      лист правки подставляет площади обмера в количество позиции, а единицу
      выбирают из канонического набора, а не пишут свободно. */
@@ -830,7 +833,8 @@ export function ProjectCard({
                   };
                   const вкладка = ВКЛАДКА[шаг];
                   if (вкладка !== undefined) { setTab(вкладка); return; }
-                  if (шаг === "clientAccess") { window.location.hash = "#settings"; return; }
+                  /* «Вход заказчику» — лист «Новый человек» (ДР-11) */
+                  if (шаг === "clientAccess") { setPersonOpen(true); return; }
                   setСводкаОткрыта(true);
                   window.requestAnimationFrame(() => {
                     const ячейка = document.getElementById("card-foreman");
@@ -1152,6 +1156,13 @@ export function ProjectCard({
             сохранить(updateSupervision(project.code, { supervisionShare: share }));
           }}
           onClose={() => { setSupervisionOpen(false); setEditError(null); }}
+        />
+      )}
+
+      {personOpen && (
+        <PersonSheet
+          project={project}
+          onClose={() => { setPersonOpen(false); }}
         />
       )}
     </>

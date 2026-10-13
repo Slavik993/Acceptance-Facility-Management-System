@@ -23,6 +23,7 @@ import { Settings } from "./Settings.js";
 import { useModalDialog } from "./modal.js";
 import { MoreMenu, type ПунктЕщё } from "./MoreMenu.js";
 import { адрес, простойЩелчок, разобрать, type Вкладка, type ОтборАдреса } from "./route.js";
+import { FirstLogin } from "./FirstLogin.js";
 
 type State =
   | { kind: "loading" }
@@ -97,10 +98,13 @@ export function App(): React.JSX.Element {
      снимается, как только человек сам сменил экран. */
   const [отбор, setОтбор] = useState<ОтборАдреса | null>(null);
   /* Очередь заказчика грузится один раз за заход и держится до следующего:
-     следом за ней приложение переставляет отметку захода, и повторный
-     запрос нового уже не показал бы (решение допроса Э8-2). */
+      следом за ней приложение переставляет отметку захода, и повторный
+      запрос нового уже не показал бы (решение допроса Э8-2). */
   const [очередьЗаказчика, setОчередьЗаказчика] = useState<Inbox | null>(null);
   const [ошибкаОчереди, setОшибкаОчереди] = useState<string | null>(null);
+  /* Экран первого входа заказчика (этап Э8, ДР-11): `seenAt === null`
+      в очереди означает, что заказчик ещё не заходил. */
+  const [firstLoginOpen, setFirstLoginOpen] = useState(false);
   /** Следующая запись адреса заменяет текущую, а не добавляется: первый
    *  адрес сеанса и адрес, поправленный после разбора. */
   const заменитьАдрес = useRef(true);
@@ -161,13 +165,15 @@ export function App(): React.JSX.Element {
         user, projects, текущий: null, заменить: заменитьАдрес, setSection, setOpened, setВкладка, setОтбор,
       });
       setState({ kind: "signed", user, projects, units });
-      /* Заход заказчика: сперва новое с прошлой отметки, затем отметка
-         «сейчас». Порядок обязателен — обратный стёр бы новое до показа. */
+  /* Заход заказчика: сперва новое с прошлой отметки, затем отметка
+          «сейчас». Порядок обязателен — обратный стёр бы новое до показа.
+          Если отметки нет вовсе — экран первого входа (ДР-11). */
       if (user.role === "CLIENT") {
         void fetchInbox()
           .then((очередь) => {
             setОчередьЗаказчика(очередь);
-            return markInboxSeen();
+            if (очередь.seenAt === null) { setFirstLoginOpen(true); }
+            else { return markInboxSeen(); }
           })
           .catch((cause: unknown) => { setОшибкаОчереди(errorMessage(cause)); });
       }
@@ -338,11 +344,14 @@ export function App(): React.JSX.Element {
     { label: "Документы", onSelect: () => { setOpened(null); setSection("documents"); } },
     { label: "Что дальше", onSelect: () => { setOpened(null); setSection("roadmap"); } },
   ];
-  /* Заказчику из служебного открыт только выход: настройки организации,
-     шаблоны её документов и дорожная карта продукта — внутренняя работа
-     компании, а не сведения о его объекте. */
+  /* Заказчику из служебного открыт выход и «Как пользоваться»:
+      настройки организации, шаблоны её документов и дорожная карта —
+      внутренняя работа компании, а не сведения о его объекте. */
   const ещё: readonly ПунктЕщё[] = state.user.role === "CLIENT"
-    ? [{ label: "Выйти", onSelect: () => { void logout().then(load); } }]
+    ? [
+        { label: "Как пользоваться", onSelect: () => { setFirstLoginOpen(true); } },
+        { label: "Выйти", onSelect: () => { void logout().then(load); } },
+      ]
     : [...служебные, { label: "Выйти", onSelect: () => { void logout().then(load); } }];
 
   const header = (
@@ -567,21 +576,35 @@ export function App(): React.JSX.Element {
               {завести("объект")}
             </button>
           ) : null)}
-          <main className="container stack stack--loose">
-            <ProjectList
-              projects={state.projects}
-              today={today}
-              filter={filter}
-              onFilter={setFilter}
-              onOpen={открыть}
-              onAdd={() => { setAdding(true); }}
-              /* Статус меняется из реестра, а не только из карточки: путь
-                 через карточку стоил четырёх нажатий при правиле «три
-                 касания до действия». Лист тот же, что на карточке, и
-                 запрос тот же — меняется место вызова, не логика. */
-              {...(ownerLevel(state.user.role) ? { onStatus: setСтатусУ } : {})}
+          {/* Заказчик без отметки захода видит экран первого входа вместо
+              списка объектов (этап Э8, ДР-11). */}
+          {state.user.role === "CLIENT" && firstLoginOpen ? (
+            <FirstLogin
+              user={state.user}
+              project={state.projects[0] ?? null}
+              onContinue={() => {
+                setFirstLoginOpen(false);
+                if (state.projects[0] !== undefined) открыть(state.projects[0]);
+              }}
+              onHowTo={() => { /* "Как пользоваться" — тот же экран, повторно */ }}
             />
-          </main>
+          ) : (
+            <main className="container stack stack--loose">
+              <ProjectList
+                projects={state.projects}
+                today={today}
+                filter={filter}
+                onFilter={setFilter}
+                onOpen={открыть}
+                onAdd={() => { setAdding(true); }}
+                /* Статус меняется из реестра, а не только из карточки: путь
+                    через карточку стоил четырёх нажатий при правиле «три
+                    касания до действия». Лист тот же, что на карточке, и
+                    запрос тот же — меняется место вызова, не логика. */
+                {...(ownerLevel(state.user.role) ? { onStatus: setСтатусУ } : {})}
+              />
+            </main>
+          )}
         </>
       )}
       {/* Заявки — раздел руководителя: прорабу маршруты закрыты ролью, и

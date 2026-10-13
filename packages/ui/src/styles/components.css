@@ -2849,3 +2849,8 @@ button.score:hover { border-block-start-color: var(--accent); color: var(--accen
   .queue__what { grid-column: 1 / -1; }
   .queue__go { grid-column: 1 / -1; inline-size: 100%; }
 }
+
+/* Четыре числа главной сеткой 2 × 2 до 480 px (ДР-12). */
+@media (max-width: 480px) {
+  .statrow { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,54 @@
+{
+  "name": "Приёмка",
+  "short_name": "Приёмка",
+  "description": "Управление объектами ремонта под ключ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F6F8",
+  "theme_color": "#4A3AB8",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "20x20",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "48x48",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' rx='4' fill='%234A3AB8'/%3E%3Cg fill='none' stroke='white' stroke-width='1.5' stroke-linecap='square' transform='translate(1 1) scale(0.9)'%3E%3Cpath d='M4 3h7l5 5v4l-5 5H4z'/%3E%3Cpath d='M8 7h4'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
