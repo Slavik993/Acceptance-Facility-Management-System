@@ -586,6 +586,17 @@ export const clientRowSchema = z.object({
   paymentGraceDays: z.number().int().nonnegative().nullable(),
   projects: z.number().int().nonnegative(),
   estimateTotal: kopecksString,
+  /**
+   * Баланс заказчика (Э7, кандидат): начислено, оплачено, ждёт.
+   *
+   * Только уровню руководителя: в ответе прораба и заказчика этих полей нет.
+   * Начислено — сумма всех принятых работ по всем объектам заказчика.
+   * Оплачено — сумма всех платежей по траншам объектов заказчика.
+   * Ждёт — начислено минус оплачено.
+   */
+  accruedTotal: kopecksString.optional(),
+  paidTotal: kopecksString.optional(),
+  awaitingTotal: kopecksString.optional(),
 });
 export type ClientRow = z.infer<typeof clientRowSchema>;
 

@@ -28,7 +28,8 @@ import { NewContactSheet } from "./NewContactSheet.js";
 
 type Contact =
   | { kind: "client"; id: string; clientId: string; name: string; code: string; note: string;
-      projects: number; total: string | null; wage: null; graceDays: number | null }
+      projects: number; total: string | null; wage: null; graceDays: number | null;
+      accrued: string | null; paid: string | null; awaiting: string | null }
   | { kind: "worker"; id: string; clientId: null; name: string; code: null; note: string;
       projects: number | null; total: null; wage: string | null; graceDays: null };
 
@@ -63,6 +64,9 @@ const toContacts = (clients: ClientRow[], workers: WorkerRow[]): Contact[] => [
     total: client.estimateTotal,
     wage: null,
     graceDays: client.paymentGraceDays,
+    accrued: client.accruedTotal ?? null,
+    paid: client.paidTotal ?? null,
+    awaiting: client.awaitingTotal ?? null,
   })),
   ...workers.map<Contact>((worker) => ({
     kind: "worker",
@@ -81,8 +85,10 @@ const toContacts = (clients: ClientRow[], workers: WorkerRow[]): Contact[] => [
 ];
 
 /**
- * Заказчик: код, имя, реквизиты, порог оплаты, объекты, итог смет. Начисления
- * ему не идут.
+ * Заказчик: код, имя, реквизиты, порог оплаты, объекты, итог смет, баланс.
+ *
+ * Баланс (Э7, кандидат): начислено, оплачено, ждёт. Только уровню
+ * руководителя — в ответе прораба и заказчика этих полей нет.
  *
  * Колонки собираются вызовом, а не стоят готовой величиной: порог правится
  * на месте, и правка нужна не всем — прораб карточку заказчика только читает.
@@ -92,6 +98,7 @@ const toContacts = (clients: ClientRow[], workers: WorkerRow[]): Contact[] => [
  */
 const колонкиЗаказчиков = (
   правитьПорог: ((clientId: string, дней: number | null) => Promise<void>) | null,
+  роль: Role,
 ): readonly Column<Contact>[] => [
   {
     key: "code",
@@ -141,6 +148,37 @@ const колонкиЗаказчиков = (
     render: (row) => (row.total === null ? <span className="t-muted">—</span> : <>{money(row.total)}</>),
     numeric: true,
   },
+  /* Баланс заказчика (Э7, кандидат): только руководителю. */
+  ...(роль === "OWNER" ? ([
+    {
+      key: "accrued",
+      label: "Начислено",
+      value: (row) => (row.accrued === null ? null : BigInt(row.accrued)),
+      render: (row) => (row.accrued === null ? <span className="t-muted">—</span> : <>{money(row.accrued)}</>),
+      numeric: true,
+    },
+    {
+      key: "paid",
+      label: "Оплачено",
+      value: (row) => (row.paid === null ? null : BigInt(row.paid)),
+      render: (row) => (row.paid === null ? <span className="t-muted">—</span> : <>{money(row.paid)}</>),
+      numeric: true,
+    },
+    {
+      key: "awaiting",
+      label: "Ждёт",
+      value: (row) => (row.awaiting === null ? null : BigInt(row.awaiting)),
+      render: (row) => {
+        if (row.awaiting === null) return <span className="t-muted">—</span>;
+        const сумма = BigInt(row.awaiting);
+        const класс = сумма > 0n
+          ? "num num--danger"
+          : "num";
+        return <span className={класс}>{money(row.awaiting)}</span>;
+      },
+      numeric: true,
+    },
+  ] as readonly Column<Contact>[])),
 ];
 
 /** Бригада: имя, вид расчётной единицы, объекты, начислено. Кода и смет у неё нет. */
@@ -221,7 +259,7 @@ export function Contacts({ role }: { role: Role }): React.JSX.Element {
       setClients(await updateClient(clientId, { paymentGraceDays: дней }));
     }
     : null;
-  const колонки = вкладка === "clients" ? колонкиЗаказчиков(правитьПорог) : WORKER_COLUMNS;
+  const колонки = вкладка === "clients" ? колонкиЗаказчиков(правитьПорог, role) : WORKER_COLUMNS;
 
   return (
     <main className="container stack stack--loose">

@@ -68,6 +68,10 @@ export class DirectoryService {
         if (estimate === undefined) return kopecks(0);
         return clientTotals(estimate.works, basisPoints(estimate.supervisionShare)).total;
       });
+      // Баланс заказчика (Э7, кандидат): только руководителю.
+      const balance = ownerLevel(user.role)
+        ? this.clientBalance(own)
+        : null;
       return {
         id: client.id,
         code: client.code,
@@ -77,8 +81,52 @@ export class DirectoryService {
         paymentGraceDays: client.paymentGraceDays,
         projects: own.length,
         estimateTotal: sum(totals).toString(),
+        ...(balance !== null
+          ? {
+              accruedTotal: balance.accrued.toString(),
+              paidTotal: balance.paid.toString(),
+              awaitingTotal: balance.awaiting.toString(),
+            }
+          : {}),
       };
     });
+  }
+
+  /**
+   * Баланс заказчика: начислено, оплачено, ждёт.
+   *
+   * Начислено — сумма всех принятых работ (wageAccrual) по всем объектам
+   * заказчика. Оплачено — сумма всех платежей (tranchePayments) по траншам
+   * объектов. Ждёт — начислено минус оплачено.
+   */
+  private async clientBalance(projectIds: { id: string }[]): Promise<{
+    accrued: Kopecks;
+    paid: Kopecks;
+    awaiting: Kopecks;
+  }> {
+    const ids = projectIds.map((p) => p.id);
+    if (ids.length === 0) {
+      return { accrued: kopecks(0), paid: kopecks(0), awaiting: kopecks(0) };
+    }
+    const [начисления, платежи] = await Promise.all([
+      this.prisma.wageAccrual.findMany({
+        where: {
+          acceptance: {
+            batch: { projectId: { in: ids } },
+          },
+        },
+        select: { amount: true },
+      }),
+      this.prisma.tranchePayment.findMany({
+        where: {
+          tranche: { projectId: { in: ids } },
+        },
+        select: { amount: true },
+      }),
+    ]);
+    const accrued = sum(начисления.map((r) => kopecks(r.amount)));
+    const paid = sum(платежи.map((r) => kopecks(r.amount)));
+    return { accrued, paid, awaiting: accrued - paid };
   }
 
   /** Карточка организации. Читают все роли: часовой пояс нужен и прорабу. */
