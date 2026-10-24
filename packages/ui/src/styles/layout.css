@@ -18,7 +18,8 @@ main.container { padding-block-end: var(--page-end); }
 
 /* На узком экране поля контейнера уменьшаются: 24 px с каждой стороны
    съедают восьмую часть экрана в 360 px. */
-@media (max-width: 767px) { :root { --gutter: var(--space-4); } }
+@media (max-width: 767px) { :root { --gutter: var(--space-5); } }
+@media (max-width: 480px) { :root { --gutter: var(--space-4); } }
 
 /* Вертикальная группа. Шаг задаётся намерением, а не номером в имени:
    .stack-2 и .stack-5 ничего не сообщали читателю кода. */

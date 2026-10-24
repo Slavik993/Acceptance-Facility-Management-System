@@ -266,7 +266,9 @@
 /* Панель — не коробка, а раздел документа: волосяные линии сверху и снизу,
    без боковых границ и без скругления. Заливку листа получают только
    таблицы, которым нужен фон под липким заголовком. */
-.panel { border-block: 1px solid var(--line); }
+.panel { border-block: 1px solid var(--line); padding: var(--space-5) var(--space-5); }
+@media (max-width: 767px) { .panel { padding: var(--space-4) var(--space-4); } }
+@media (max-width: 480px) { .panel { padding: var(--space-3) var(--space-3); } }
 .panel--sheet { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .panel--pad   { padding: var(--space-4) 0; }
 .panel--sheet.panel--pad { padding: var(--space-4); }

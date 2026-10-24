@@ -86,9 +86,11 @@ export function Accounting({
 
   if (error !== null) {
     return (
-      <div className="empty">
-        <p className="empty__title">Бухгалтерия недоступна</p>
-        <p className="empty__text">{error}</p>
+      <div className="panel">
+        <div className="empty">
+          <p className="empty__title">Бухгалтерия недоступна</p>
+          <p className="empty__text">{error}</p>
+        </div>
       </div>
     );
   }
@@ -97,12 +99,14 @@ export function Accounting({
   }
   if (view.rows.length === 0) {
     return (
-      <div className="empty">
-        <p className="empty__title">Денег по объектам пока нет</p>
-        <p className="empty__text">
-          Здесь появятся транши объектов: сколько предъявлено заказчику, сколько ждёт
-          оплаты и сколько получено. Транш заводится на вкладке «Транши» объекта.
-        </p>
+      <div className="panel">
+        <div className="empty">
+          <p className="empty__title">Денег по объектам пока нет</p>
+          <p className="empty__text">
+            Здесь появятся транши объектов: сколько предъявлено заказчику, сколько ждёт
+            оплаты и сколько получено. Транш заводится на вкладке «Транши» объекта.
+          </p>
+        </div>
       </div>
     );
   }
