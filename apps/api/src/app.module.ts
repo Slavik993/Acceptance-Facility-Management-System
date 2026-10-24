@@ -41,6 +41,9 @@ import { InboxController } from "./inbox/inbox.controller";
 import { FilesService } from "./files/files.service";
 import { FilesController } from "./files/files.controller";
 import { FileStorage, LocalFileStorage } from "./common/file-storage";
+import { FeedbackService } from "./feedback/feedback.service";
+import { FeedbackController } from "./feedback/feedback.controller";
+import { FeedbackExportController } from "./feedback/feedback-export.controller";
 
 @Module({
   controllers: [
@@ -53,6 +56,8 @@ import { FileStorage, LocalFileStorage } from "./common/file-storage";
     AccountingController,
     InboxController,
     FilesController,
+    FeedbackController,
+    FeedbackExportController,
   ],
   providers: [
     PrismaService, AuthService, SessionGuard, RolesGuard, AuditService,
@@ -70,6 +75,7 @@ import { FileStorage, LocalFileStorage } from "./common/file-storage";
     AccountingService,
     InboxService,
     FilesService,
+    FeedbackService,
     // Хранилище файлов подключается портом: смена реализации на S3 при
     // переезде в облако (план 6.1) — правка этой одной строки.
     { provide: FileStorage, useClass: LocalFileStorage },

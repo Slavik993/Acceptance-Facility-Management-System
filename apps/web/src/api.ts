@@ -26,7 +26,7 @@ import {
   type BlueprintRow, type BlueprintView, type CreateBlueprint,
   type MoveEstimateItem, type UpdateEstimateItem, type UpdateSupervision,
   type CreateEstimateItem, type CreateEstimateSection, type RenameEstimateSection, type ProjectFacts,
-  type UpdateProject, type Foreman, type ProjectFile,
+  type UpdateProject, type Foreman,
   type UpdateWorkStage, type WorkerRow, type WorkStage,
   type ConvertLead, type CreateLead, type CreateLeadTask, type CreateRepairType,
   type LeadBoard, type LeadCard, type LoseLead, type PhotoReport, type RepairType,

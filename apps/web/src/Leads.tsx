@@ -78,9 +78,9 @@ export function Leads({ onOpenProject }: { onOpenProject: (code: string) => void
   const отфильтрованы = (leads: readonly LeadCard[]): LeadCard[] =>
     leads.filter((lead) => ищет(lead, запрос));
 
-  const всегоНайдено = board === null
-    ? 0
-    : board.columns.reduce((total, col) => total + отфильтрованы(col.leads).length, 0);
+  const всегоНайдено = board.columns.reduce(
+    (total, col) => total + отфильтрованы(col.leads).length, 0,
+  );
 
   const выбранная = колонки.find((column) => column.stage === current) ?? колонки[0];
 

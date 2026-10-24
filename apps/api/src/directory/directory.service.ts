@@ -61,7 +61,7 @@ export class DirectoryService {
       orderBy: { code: "asc" },
     });
 
-    return clients.map((client) => {
+    return await Promise.all(clients.map(async (client) => {
       const own = projects.filter((project) => project.clientId === client.id);
       const totals: Kopecks[] = own.map((project) => {
         const estimate = facts.get(project.id);
@@ -70,7 +70,7 @@ export class DirectoryService {
       });
       // Баланс заказчика (Э7, кандидат): только руководителю.
       const balance = ownerLevel(user.role)
-        ? this.clientBalance(own)
+        ? await this.clientBalance(own)
         : null;
       return {
         id: client.id,
@@ -89,7 +89,7 @@ export class DirectoryService {
             }
           : {}),
       };
-    });
+    }));
   }
 
   /**
@@ -126,7 +126,7 @@ export class DirectoryService {
     ]);
     const accrued = sum(начисления.map((r) => kopecks(r.amount)));
     const paid = sum(платежи.map((r) => kopecks(r.amount)));
-    return { accrued, paid, awaiting: accrued - paid };
+    return { accrued, paid, awaiting: kopecks(accrued - paid) };
   }
 
   /** Карточка организации. Читают все роли: часовой пояс нужен и прорабу. */

@@ -1,0 +1,30 @@
+model Feedback {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  area          FeedbackArea
+  /// Шаблон пути: `/cabinet/stages/[id]`, а не адрес с идентификатором.
+  pathTemplate  String
+  text          String       @db.Text
+  /// «телефон», «планшет», «компьютер» — по ширине окна, считает сервер.
+  device        String
+  viewportWidth Int?
+
+  /// Снимок экрана — только с публичных страниц. Ключ — случайный, без
+  /// исходного имени файла; тип — по сигнатуре байтов, а не по заголовку.
+  screenshotKey  String?
+  screenshotType String?
+  screenshotSize Int?
+
+  /// Критичность по правилам при отправке и текущая — после разбора.
+  severityAuto FeedbackSeverity
+  severity     FeedbackSeverity
+  status       FeedbackStatus   @default(NEW)
+  /// Что сделано — пишет руководитель на еженедельном разборе.
+  note         String?          @db.Text
+  resolvedAt   DateTime?
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+}

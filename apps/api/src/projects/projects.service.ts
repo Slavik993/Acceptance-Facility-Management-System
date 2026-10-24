@@ -697,7 +697,7 @@ interface ProjectRow {
   createdAt: Date;
   keysCount: number;
   supervisionShare: number;
-  client: { code: string; name: string; isCompany: boolean; requisites: string | null };
+  client: { id: string; code: string; name: string; isCompany: boolean; requisites: string | null };
   foreman: { id: string; name: string } | null;
   workStages: StageRow[];
 }
@@ -800,6 +800,7 @@ function toSummary(
        «выработан ровно до копейки». */
     ...(заказчик ? {} : { spentMaterials: (расходы?.spent ?? 0n).toString() }),
     client: {
+      id: project.client.id,
       code: project.client.code,
       name: project.client.name,
       isCompany: project.client.isCompany,

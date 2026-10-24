@@ -1,7 +1,6 @@
-import { useState } from "react";
-import type { CurrentUser, ProjectSummary } from "@priyomka/contracts";
-import { formatKopecks } from "@priyomka/ui";
-import { STATUS_LABEL } from "./status.js";
+import { useEffect, useState } from "react";
+import type { CurrentUser, Organization, ProjectSummary } from "@priyomka/contracts";
+import { fetchOrganization } from "./api.js";
 
 /**
  * Экран первого входа заказчика (этап Э8, ДР-11).
@@ -29,6 +28,24 @@ export function FirstLogin({
   onHowTo: () => void;
 }): React.JSX.Element {
   const [seen, setSeen] = useState(false);
+
+  /* Связаться с организацией: вошедшему доступны только её
+     название, а телефон и почта — полная карточка организации,
+     один запрос на экран. */
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  useEffect(() => {
+    void fetchOrganization()
+      .then(setOrganization)
+      .catch(() => setOrganization(null));
+  }, []);
+
+  /* Строка связи: название организации, телефон и почта —
+     непустые звенья через точку с запятой. */
+  const связать = organization === null
+    ? user.organization.name
+    : [organization.name, organization.phone, organization.email]
+        .filter((значение) => значение !== null)
+        .join(" · ");
 
   /* Отмечаем, что заказчик видел экран: при первом нажатии «Перейти»
      ставим отметку захода, чтобы повторно экран не показывался. */
@@ -72,11 +89,7 @@ export function FirstLogin({
         <h2 className="t-h3">Как связаться</h2>
         {project !== null && (
           <>
-            <p className="t-sm">
-              {user.organization.name}
-              {project.client.phone !== null && ` · +7 ${project.client.phone}`}
-              {project.client.email !== null && ` · ${project.client.email}`}
-            </p>
+            <p className="t-sm">{связать}</p>
             {project.foreman !== null && (
               <p className="t-sm">Прораб объекта: {project.foreman.name}</p>
             )}

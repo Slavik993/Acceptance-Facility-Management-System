@@ -31,6 +31,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "8e966eda-3850-4842-9cd5-968ba255f062",
     "code": "412",
     "name": "Анна Мещерякова",
     "isCompany": false,
@@ -95,6 +96,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "049ce919-0a5f-4b49-b951-6061d005b480",
     "code": "204",
     "name": "ООО «Гранит-Строй»",
     "isCompany": true,
@@ -159,6 +161,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "61dd9637-5924-43a0-bd60-f34ad43be253",
     "code": "300",
     "name": "Ирина Ковалёва",
     "isCompany": false,
@@ -231,6 +234,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "5c045d68-027e-4adc-b963-73dd76862e80",
     "code": "118",
     "name": "Сергей Балашов",
     "isCompany": false,
@@ -262,6 +266,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "8e966eda-3850-4842-9cd5-968ba255f062",
     "code": "412",
     "name": "Анна Мещерякова",
     "isCompany": false,
@@ -293,6 +298,7 @@
    "supervisionShare": 1500,
    "spentMaterials": "0",
    "client": {
+    "id": "049ce919-0a5f-4b49-b951-6061d005b480",
     "code": "204",
     "name": "ООО «Гранит-Строй»",
     "isCompany": true,
@@ -373,6 +379,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "5c045d68-027e-4adc-b963-73dd76862e80",
     "code": "118",
     "name": "Сергей Балашов",
     "isCompany": false,
@@ -448,6 +455,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "5220000",
    "client": {
+    "id": "61dd9637-5924-43a0-bd60-f34ad43be253",
     "code": "300",
     "name": "Ирина Ковалёва",
     "isCompany": false,
@@ -555,6 +563,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "0",
    "client": {
+    "id": "5c045d68-027e-4adc-b963-73dd76862e80",
     "code": "118",
     "name": "Сергей Балашов",
     "isCompany": false,
@@ -629,6 +638,7 @@
    "supervisionShare": 1200,
    "spentMaterials": "5220000",
    "client": {
+    "id": "61dd9637-5924-43a0-bd60-f34ad43be253",
     "code": "300",
     "name": "Ирина Ковалёва",
     "isCompany": false,
@@ -1747,6 +1757,7 @@
    "keysCount": 1,
    "supervisionShare": 1200,
    "client": {
+    "id": "61dd9637-5924-43a0-bd60-f34ad43be253",
     "code": "300",
     "name": "Ирина Ковалёва",
     "isCompany": false,
@@ -1815,6 +1826,7 @@
    "keysCount": 2,
    "supervisionShare": 1200,
    "client": {
+    "id": "61dd9637-5924-43a0-bd60-f34ad43be253",
     "code": "300",
     "name": "Ирина Ковалёва",
     "isCompany": false,

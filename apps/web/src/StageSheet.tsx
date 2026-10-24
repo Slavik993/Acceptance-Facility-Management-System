@@ -264,6 +264,7 @@ export function StageSheet({
                 ))}
               </select>
             </label>
+            )}
 
             {/* Каскадный сдвиг (Э7, кандидат): при правке дат все последующие
                 этапы сдвигаются на ту же разницу. */}
@@ -275,7 +276,7 @@ export function StageSheet({
                 role="switch"
                 aria-checked={cascade}
                 checked={cascade}
-                onChange={(event) => { /* управляется родителем */ }}
+                onChange={() => { /* управляется родителем */ }}
                 tabIndex={-1}
               />
             </label>
@@ -284,7 +285,6 @@ export function StageSheet({
                 ? "Все последующие этапы сдвинутся на ту же разницу дат"
                 : "Сдвинется только этот этап"}
             </p>
-            )}
 
             {fault !== null && <p className="field__error" role="alert">{fault}</p>}
             {error !== null && <p className="field__error" role="alert">{error}</p>}

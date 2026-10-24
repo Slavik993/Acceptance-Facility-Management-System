@@ -39,11 +39,11 @@ describe("каскадный сдвиг", () => {
         endsOn: shiftDay(s.endsOn, delta),
       };
     });
-    expect(результат[0].startsOn).toBe("2026-01-01"); // не сдвинут
-    expect(результат[1].startsOn).toBe("2026-01-11"); // +3
-    expect(результат[1].endsOn).toBe("2026-01-17");   // +3
-    expect(результат[2].startsOn).toBe("2026-01-18"); // +3
-    expect(результат[2].endsOn).toBe("2026-01-24");   // +3
+    expect(результат[0]?.startsOn).toBe("2026-01-01"); // не сдвинут
+    expect(результат[1]?.startsOn).toBe("2026-01-11"); // +3
+    expect(результат[1]?.endsOn).toBe("2026-01-17");   // +3
+    expect(результат[2]?.startsOn).toBe("2026-01-18"); // +3
+    expect(результат[2]?.endsOn).toBe("2026-01-24");   // +3
   });
 
   it("каскад с отрицательным сдвигом", () => {
@@ -61,8 +61,8 @@ describe("каскадный сдвиг", () => {
         endsOn: shiftDay(s.endsOn, delta),
       };
     });
-    expect(результат[1].startsOn).toBe("2026-01-06");
-    expect(результат[1].endsOn).toBe("2026-01-12");
+    expect(результат[1]?.startsOn).toBe("2026-01-06");
+    expect(результат[1]?.endsOn).toBe("2026-01-12");
   });
 
   it("каскад: сдвиг на 0 ничего не меняет", () => {
@@ -80,7 +80,7 @@ describe("каскадный сдвиг", () => {
         endsOn: shiftDay(s.endsOn, delta),
       };
     });
-    expect(результат[1].startsOn).toBe("2026-01-08");
-    expect(результат[1].endsOn).toBe("2026-01-14");
+    expect(результат[1]?.startsOn).toBe("2026-01-08");
+    expect(результат[1]?.endsOn).toBe("2026-01-14");
   });
 });

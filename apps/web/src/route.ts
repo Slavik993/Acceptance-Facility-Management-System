@@ -17,7 +17,7 @@ import { SECTIONS, type Section } from "./sections.js";
  */
 export const ВКЛАДКИ = [
   "overview", "measure", "estimate", "work", "acceptance",
-  "expenses", "report", "tranches", "documents", "import",
+  "expenses", "report", "tranches", "documents", "files", "import",
 ] as const;
 export type Вкладка = (typeof ВКЛАДКИ)[number];
 

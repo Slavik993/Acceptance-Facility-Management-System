@@ -298,6 +298,7 @@ export const projectSummarySchema = z.object({
    */
   spentMaterials: kopecksString.optional(),
   client: z.object({
+    id: z.string().uuid(),
     code: z.string(),
     name: z.string(),
     isCompany: z.boolean(),
@@ -2217,3 +2218,60 @@ export const createProjectFileSchema = z.object({
   description: z.string().max(500).optional().nullable(),
 });
 export type CreateProjectFile = z.infer<typeof createProjectFileSchema>;
+
+/* ===========================================================================
+   Замечания о платформе (решение заказчика от 24.10.2026, перенос Р-403 ProDisser)
+   ========================================================================== */
+
+/** Виды замечаний. */
+export const feedbackKindSchema = z.enum(["DEFECT", "IDEA", "COMMENT", "WORKS"]);
+export type FeedbackKindContract = z.infer<typeof feedbackKindSchema>;
+
+/** Критичность. */
+export const feedbackSeveritySchema = z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW"]);
+export type FeedbackSeverityContract = z.infer<typeof feedbackSeveritySchema>;
+
+/** Состояние разбора. */
+export const feedbackStatusSchema = z.enum(["NEW", "IN_WORK", "DONE", "DECLINED"]);
+export type FeedbackStatusContract = z.infer<typeof feedbackStatusSchema>;
+
+/** Строка для экрана разбора и книги. */
+export const feedbackRowSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string(),
+  kind: feedbackKindSchema,
+  authorRole: roleSchema,
+  routeTemplate: z.string(),
+  section: z.string(),
+  objectCode: z.string().nullable(),
+  tab: z.string(),
+  device: z.string(),
+  viewportWidth: z.number().nullable(),
+  text: z.string(),
+  severityAuto: feedbackSeveritySchema,
+  severity: feedbackSeveritySchema,
+  status: feedbackStatusSchema,
+  note: z.string().nullable(),
+  resolvedAt: z.string().nullable(),
+  hasScreenshot: z.boolean(),
+});
+export type FeedbackRow = z.infer<typeof feedbackRowSchema>;
+
+/** Плитки сводки замечаний. */
+export const feedbackDigestSchema = z.object({
+  fresh: z.number().int().nonnegative(),
+  inWork: z.number().int().nonnegative(),
+  criticalOpen: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+});
+export type FeedbackDigest = z.infer<typeof feedbackDigestSchema>;
+
+/** Разбор замечания: хотя бы одно поле, note до 2000 знаков, строгий режим. */
+export const reviewFeedbackSchema = z.object({
+  status: feedbackStatusSchema.optional(),
+  severity: feedbackSeveritySchema.optional(),
+  note: z.string().max(2000).optional(),
+}).strict().refine((d) => d.status !== undefined || d.severity !== undefined || d.note !== undefined, {
+  message: "Укажите хотя бы одно поле: status, severity или note.",
+});
+export type ReviewFeedback = z.infer<typeof reviewFeedbackSchema>;

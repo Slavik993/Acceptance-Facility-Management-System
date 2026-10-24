@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { ClientRow, ProjectSummary } from "@priyomka/contracts";
-import { invitePerson, errorMessage, fetchClients } from "./api.js";
+import type { ProjectSummary } from "@priyomka/contracts";
+import { invitePerson, errorMessage } from "./api.js";
 import { useModalDialog } from "./modal.js";
 
 /**
@@ -19,7 +19,7 @@ export function PersonSheet({
   project: ProjectSummary;
   onClose: () => void;
 }): React.JSX.Element {
-  const { dialog, first } = useModalDialog(onClose);
+  const { dialog, first } = useModalDialog<HTMLInputElement>(onClose);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export function PersonSheet({
 
   const ready = name.trim().length >= 2;
 
-  const submit: React.FormEventHandler = (event) => {
+  const submit: React.SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     if (!ready || busy) return;
     setBusy(true);

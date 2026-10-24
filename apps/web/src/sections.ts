@@ -36,7 +36,7 @@ export const PLANNED_SECTIONS: readonly Section[] = [];
    закреплён эталоном (пять разделов и «Ещё») и стережётся проверкой обхода.
    Документы организации — настройка компании, и живут они там же, где
    настройки. */
-export type Section = (typeof SECTIONS)[number]["key"] | "settings" | "roadmap" | "documents";
+export type Section = (typeof SECTIONS)[number]["key"] | "settings" | "roadmap" | "documents" | "feedback";
 
 /**
  * Что появится дальше. Один список на весь продукт: и разделы шапки, и

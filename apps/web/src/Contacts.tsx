@@ -153,23 +153,27 @@ const колонкиЗаказчиков = (
     {
       key: "accrued",
       label: "Начислено",
-      value: (row) => (row.accrued === null ? null : BigInt(row.accrued)),
-      render: (row) => (row.accrued === null ? <span className="t-muted">—</span> : <>{money(row.accrued)}</>),
+      value: (row) => (row.kind === "client" && row.accrued !== null ? BigInt(row.accrued) : null),
+      render: (row) => (row.kind !== "client" || row.accrued === null
+        ? <span className="t-muted">—</span>
+        : <>{money(row.accrued)}</>),
       numeric: true,
     },
     {
       key: "paid",
       label: "Оплачено",
-      value: (row) => (row.paid === null ? null : BigInt(row.paid)),
-      render: (row) => (row.paid === null ? <span className="t-muted">—</span> : <>{money(row.paid)}</>),
+      value: (row) => (row.kind === "client" && row.paid !== null ? BigInt(row.paid) : null),
+      render: (row) => (row.kind !== "client" || row.paid === null
+        ? <span className="t-muted">—</span>
+        : <>{money(row.paid)}</>),
       numeric: true,
     },
     {
       key: "awaiting",
       label: "Ждёт",
-      value: (row) => (row.awaiting === null ? null : BigInt(row.awaiting)),
+      value: (row) => (row.kind === "client" && row.awaiting !== null ? BigInt(row.awaiting) : null),
       render: (row) => {
-        if (row.awaiting === null) return <span className="t-muted">—</span>;
+        if (row.kind !== "client" || row.awaiting === null) return <span className="t-muted">—</span>;
         const сумма = BigInt(row.awaiting);
         const класс = сумма > 0n
           ? "num num--danger"
@@ -178,7 +182,7 @@ const колонкиЗаказчиков = (
       },
       numeric: true,
     },
-  ] as readonly Column<Contact>[])),
+  ] as readonly Column<Contact>[]) : []),
 ];
 
 /** Бригада: имя, вид расчётной единицы, объекты, начислено. Кода и смет у неё нет. */

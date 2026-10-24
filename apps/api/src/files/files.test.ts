@@ -76,7 +76,8 @@ function стенд() {
 
   const prisma = {
     project: {
-      findFirst: vi.fn(() => Promise.resolve({ id: "объект-99", code: "R-99" })),
+      findFirst: vi.fn((): Promise<{ id: string; code: string } | null> =>
+        Promise.resolve({ id: "объект-99", code: "R-99" })),
     },
     projectFile: {
       findMany: vi.fn(() => Promise.resolve(ФАЙЛЫ)),
@@ -108,7 +109,7 @@ function стенд() {
     }),
   };
 
-  const служба = new FilesService(prisma as never, storage as never, audit as never);
+  const служба = new FilesService(prisma as never, storage, audit);
   return { служба, prisma, tx, положено, снято, удалённые, журнал };
 }
 
@@ -118,9 +119,10 @@ describe("файлы объекта", () => {
   it("список: файлы объекта, свежие сверху, датой строкой", async () => {
     const { служба, prisma } = стенд();
     const файлы = await служба.list(USER, "R-99");
-    expect(prisma.project.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ code: "R-99" }) }),
-    );
+    expect(prisma.project.findFirst).toHaveBeenCalledWith({
+      where: { orgId: "орг", code: "R-99" },
+      select: { id: true, code: true },
+    });
     expect(файлы).toHaveLength(2);
     expect(файлы[0]?.id).toBe("файл-старый");
     expect(файлы[0]?.uploadedAt).toBe("2026-09-08T10:15:00.000Z");

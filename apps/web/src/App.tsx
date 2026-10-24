@@ -24,6 +24,8 @@ import { useModalDialog } from "./modal.js";
 import { MoreMenu, type ПунктЕщё } from "./MoreMenu.js";
 import { адрес, простойЩелчок, разобрать, type Вкладка, type ОтборАдреса } from "./route.js";
 import { FirstLogin } from "./FirstLogin.js";
+import { FeedbackButton } from "./FeedbackButton.js";
+import { FeedbackScreen } from "./FeedbackScreen.js";
 
 type State =
   | { kind: "loading" }
@@ -333,17 +335,21 @@ export function App(): React.JSX.Element {
 
   /* Служебные экраны и выход — один перечень на шапку и на таб-панель.
      Две копии разошлись бы на первой же правке состава. */
-  const служебные: readonly ПунктЕщё[] = [
-    /* Настройки компании и выдача входа — руководителю. Бухгалтеру решением
-       заказчика от 19.09.2026 открыто всё, кроме них, и пункт, отвечающий
-       отказом, читался бы поломкой продукта: то же правило, по которому
-       прорабу не показывают кнопку заведения объекта. */
-    ...(state.user.role === "ACCOUNTANT"
-      ? []
-      : [{ label: "Настройки", onSelect: () => { setOpened(null); setSection("settings"); } }]),
-    { label: "Документы", onSelect: () => { setOpened(null); setSection("documents"); } },
-    { label: "Что дальше", onSelect: () => { setOpened(null); setSection("roadmap"); } },
-  ];
+   const служебные: readonly ПунктЕщё[] = [
+     /* Замечания о платформе — экран руководителя: разбор, книга, ключ. */
+     ...(state.user.role === "OWNER"
+       ? [{ label: "Замечания", onSelect: () => { setOpened(null); setSection("feedback"); } }]
+       : []),
+     /* Настройки компании и выдача входа — руководителю. Бухгалтеру решением
+        заказчика от 19.09.2026 открыто всё, кроме них, и пункт, отвечающий
+        отказом, читался бы поломкой продукта: то же правило, по которому
+        прорабу не показывают кнопку заведения объекта. */
+     ...(state.user.role === "ACCOUNTANT"
+       ? []
+       : [{ label: "Настройки", onSelect: () => { setOpened(null); setSection("settings"); } }]),
+     { label: "Документы", onSelect: () => { setOpened(null); setSection("documents"); } },
+     { label: "Что дальше", onSelect: () => { setOpened(null); setSection("roadmap"); } },
+   ];
   /* Заказчику из служебного открыт выход и «Как пользоваться»:
       настройки организации, шаблоны её документов и дорожная карта —
       внутренняя работа компании, а не сведения о его объекте. */
@@ -727,7 +733,14 @@ export function App(): React.JSX.Element {
       {feedOpen && (
         <FeedSheet events={events} role={state.user.role} onClose={() => { setFeedOpen(false); }} />
       )}
-      {tabbar}
+      {section === "feedback" ? (
+        <FeedbackScreen onBack={() => go("projects")} />
+      ) : (
+        <>
+          {tabbar}
+          <FeedbackButton />
+        </>
+      )}
     </>
   );
 }

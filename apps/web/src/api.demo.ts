@@ -488,6 +488,7 @@ export async function createProject(input: CreateProject): Promise<ProjectSummar
     spentMaterials: "0",
     supervisionShare: input.supervisionShare ?? 1200,
     client: {
+      id: client?.id ?? input.clientId,
       code: client?.code ?? "—",
       name: client?.name ?? "—",
       isCompany: client?.isCompany ?? false,
@@ -1280,15 +1281,20 @@ export async function updateStage(
     const delta = Math.round((newStart.getTime() - oldStart.getTime()) / (1000 * 60 * 60 * 24));
     if (delta !== 0) {
       const found = список.findIndex((s) => s.id === id);
-      for (let i = found + 1; i < список.length; i++) {
-        const s = список[i];
-        const oldStartS = new Date(`${s.startsOn}T00:00:00Z`);
-        const oldEndS = new Date(`${s.endsOn}T00:00:00Z`);
-        oldStartS.setDate(oldStartS.getDate() + delta);
-        oldEndS.setDate(oldEndS.getDate() + delta);
-        const idx = этапы.findIndex((e) => e.id === s.id);
-        if (idx !== -1) {
-          этапы[idx] = { ...список[i], startsOn: oldStartS.toISOString().slice(0, 10), endsOn: oldEndS.toISOString().slice(0, 10) };
+      /* Не найденный этап не сдвигает остальные: последующие
+         считаются от него, а не от начала графика. */
+      if (found !== -1) {
+        for (let i = found + 1; i < список.length; i++) {
+          const s = список[i];
+          if (s === undefined) continue;
+          const oldStartS = new Date(`${s.startsOn}T00:00:00Z`);
+          const oldEndS = new Date(`${s.endsOn}T00:00:00Z`);
+          oldStartS.setDate(oldStartS.getDate() + delta);
+          oldEndS.setDate(oldEndS.getDate() + delta);
+          const idx = этапы.findIndex((e) => e.id === s.id);
+          if (idx !== -1) {
+            этапы[idx] = { ...s, startsOn: oldStartS.toISOString().slice(0, 10), endsOn: oldEndS.toISOString().slice(0, 10) };
+          }
         }
       }
     }
@@ -2522,9 +2528,11 @@ export async function deleteFile(code: string, id: string): Promise<ProjectFile[
     const где = загруженные.findIndex((файл) => файл.id === id);
     if (где >= 0) {
       const [удалённый] = загруженные.splice(где, 1);
-      const адрес = адресаФайлов.get(удалённый.id);
-      if (адрес !== undefined) URL.revokeObjectURL(адрес);
-      адресаФайлов.delete(удалённый.id);
+      if (удалённый !== undefined) {
+        const адрес = адресаФайлов.get(удалённый.id);
+        if (адрес !== undefined) URL.revokeObjectURL(адрес);
+        адресаФайлов.delete(удалённый.id);
+      }
     }
   }
   /* Файл со стенда: удаление в демонстрации не может изменить

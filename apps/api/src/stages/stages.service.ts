@@ -592,23 +592,28 @@ export class StagesService {
           select: { id: true, startsOn: true, endsOn: true, name: true },
         });
         const found = allStages.findIndex((s) => s.id === id);
-        for (let i = found + 1; i < allStages.length; i++) {
-          const s = allStages[i];
-          const newStart = shiftDay(s.startsOn.toISOString().slice(0, 10), delta);
-          const newEnd = shiftDay(s.endsOn.toISOString().slice(0, 10), delta);
-          await tx.workStage.update({
-            where: { id: s.id },
-            data: { startsOn: new Date(newStart), endsOn: new Date(newEnd) },
-          });
-          await this.audit.record({
-            orgId: user.orgId,
-            actorId: user.id,
-            entity: "WorkStage",
-            entityId: s.id,
-            field: `сроки этапа «${s.name}» (каскад)`,
-            oldValue: дляЖурнала(`${iso(s.startsOn)} — ${iso(s.endsOn)}`),
-            newValue: дляЖурнала(`${newStart} — ${newEnd}`),
-          }, tx);
+        /* Не найденный этап не сдвигает остальные: последующие
+           считаются от него, а не от начала графика. */
+        if (found !== -1) {
+          for (let i = found + 1; i < allStages.length; i++) {
+            const s = allStages[i];
+            if (s === undefined) continue;
+            const newStart = shiftDay(s.startsOn.toISOString().slice(0, 10), delta);
+            const newEnd = shiftDay(s.endsOn.toISOString().slice(0, 10), delta);
+            await tx.workStage.update({
+              where: { id: s.id },
+              data: { startsOn: new Date(newStart), endsOn: new Date(newEnd) },
+            });
+            await this.audit.record({
+              orgId: user.orgId,
+              actorId: user.id,
+              entity: "WorkStage",
+              entityId: s.id,
+              field: `сроки этапа «${s.name}» (каскад)`,
+              oldValue: дляЖурнала(`${iso(s.startsOn)} — ${iso(s.endsOn)}`),
+              newValue: дляЖурнала(`${newStart} — ${newEnd}`),
+            }, tx);
+          }
         }
       }
     });

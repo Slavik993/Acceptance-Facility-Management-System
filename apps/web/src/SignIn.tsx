@@ -2,6 +2,9 @@ import { useState } from "react";
 import { parsePhone } from "@priyomka/domain";
 import { confirmSmsCode, requestSmsCode, errorMessage } from "./api.js";
 
+/** Токен сессии для быстрого входа в dev-режиме. */
+const DEV_SESSION_TOKEN = "dev-session-token-12345";
+
 /**
  * Вход по номеру телефона в два шага.
  *
@@ -52,6 +55,14 @@ export function SignIn({ onSignedIn }: { onSignedIn: () => void }): React.JSX.El
       .then(onSignedIn)
       .catch((cause: unknown) => setError(errorMessage(cause)))
       .finally(() => setBusy(false));
+  };
+
+  /** Быстрый вход в dev-режиме: создаёт сессию напрямую. */
+  const devLogin: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    // Ставим куку сессии вручную — имя должно совпадать с SESSION_COOKIE в бэкенде
+    document.cookie = `priyomka_session=${DEV_SESSION_TOKEN}; path=/; SameSite=Lax`;
+    onSignedIn();
   };
 
   return (
@@ -107,6 +118,16 @@ export function SignIn({ onSignedIn }: { onSignedIn: () => void }): React.JSX.El
           <div className="signin__actions">
             <button className="btn btn--primary" type="submit" data-loading={busy || undefined}>
               Продолжить
+            </button>
+          </div>
+          {/* Разделитель */}
+          <div className="signin__divider">
+            <span>или</span>
+          </div>
+          {/* Кнопка быстрого входа в dev-режиме */}
+          <div className="signin__actions">
+            <button className="btn btn--secondary" type="button" onClick={devLogin}>
+              Войти как руководитель
             </button>
           </div>
           {/* Тому, кому доступ не выдали, сказано, что делать. Прежде экран

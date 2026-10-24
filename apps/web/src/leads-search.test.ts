@@ -6,7 +6,7 @@ import type { LeadCard } from "@priyomka/contracts";
  *
  * Проверяет функцию `ищет`: номер, имя, телефон, регистр, пробелы.
  */
-typefixture const заявка = (
+const заявка = (
   number: number,
   name: string,
   phone: string,
