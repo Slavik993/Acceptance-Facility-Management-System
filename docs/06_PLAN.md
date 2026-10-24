@@ -540,3 +540,22 @@ node scripts/verify-api.mjs && node scripts/verify-page.mjs
 Вынесено в квиз и работой не закрывается: очередь следующих модулей, судьба роли «снабжение»,
 частичная оплата, порог просрочки, личный кабинет заказчика, замер метрики «30 секунд»,
 настройка окружения публикации.
+
+## Этап Ф. Замечания о платформе, 24.10.2026
+
+Механизм перенесён из ProDisser (решения Р-403, Р-405, Р-583). Кнопка на всех экранах у всех четырёх ролей, автоматический сбор в PostgreSQL, экран разбора для руководителя, книга Excel, экспорт по ключу для исполнителя правок.
+
+| № | Работа | Статус |
+|---|---|---|
+| Ф.1 | Домен: виды, критичность, шаблон адреса, контакты, устройство — 23 теста | ✔ 24.10.2026: `packages/domain/src/feedback.ts`, `feedback.test.ts` |
+| Ф.2 | Книга Excel: листы «Замечания» (17 столбцов) и «Сводка» — 6 тестов | ✔ 24.10.2026: `packages/importer/src/feedback-book.ts`, `feedback-book.test.ts` |
+| Ф.3 | Контракты zod: feedbackRowSchema, feedbackDigestSchema, reviewFeedbackSchema | ✔ 24.10.2026: `packages/contracts/src/index.ts` |
+| Ф.4 | Модель Feedback в Prisma, миграция | ✔ 24.10.2026: `apps/api/prisma/schema.prisma`, relation на Organization |
+| Ф.5 | Сервер: приём у четырёх ролей, перечень/разбор/книга/снимок — OWNER | ✔ 24.10.2026: `apps/api/src/feedback/feedback.controller.ts`, `feedback.service.ts` |
+| Ф.6 | Экспорт по ключу: Bearer + SHA-256 + timingSafeEqual, 300 запросов/10 мин | ✔ 24.10.2026: `apps/api/src/feedback/feedback-export.controller.ts`, `feedback-export.guard.ts` |
+| Ф.7 | Клиент: кнопка в правом нижнем углу, sheet с видами/текстом/экраном | ✔ 24.10.2026: `apps/web/src/FeedbackButton.tsx`, интеграция в `App.tsx` |
+| Ф.8 | Экран «Замечания»: плитки, отборы, таблица, разбор на месте, выгрузка Excel | ✔ 24.10.2026: `apps/web/src/FeedbackScreen.tsx`, пункт в «Ещё» |
+| Ф.9 | Демонстрация: двойник API, прежний приёмник Apps Script, поле «Имя» снято | ✔ 24.10.2026: `main.demo.tsx`, `api.demo.ts` |
+| Ф.10 | Еженедельный цикл: утилита `feedback-pull.mjs` для исполнителя правок | ✔ 24.10.2026: `scripts/feedback-pull.mjs` (из `docs/feedback-kit/templates/`) |
+
+**Готовность этапа:** все 29 тестов зелёные (23 домен + 6 книга). Кнопка видна на всех экранах у всех ролей. Руководитель разбирает замечания на экране «Замечания» и выгружает книгу Excel. Исполнитель забирает замечания по ключу. Демонстрация пишет в Google-таблицу как прежде.
