@@ -1,30 +1,59 @@
+# ============================================
+# Деплой на Render: два сервиса на один репозиторий.
+#
+# Схема: клиент и API живут на одном источнике — веб-узел (nginx) отдаёт
+# статику и проксирует /api на API. Так кука сессии (httpOnly, SameSite=Lax)
+# остаётся для одного домена и не требует CORS.
+#
+# Сервисы созданы вручную в панели Render (см. DEPLOY_RENDER.md). Файл
+# описывает их настройки и служит опорой при пересоздании.
+# ============================================
 services:
   # ============================================
   # API (NestJS + Prisma)
   # ============================================
-  # ВАЖНО: сначала создайте PostgreSQL вручную через UI Render,
-  # затем скопируйте Internal Database URL и вставьте в env переменные сервиса
   - type: web
-    name: priyomka-api
-    runtime: docker
-    repo: https://github.com/klemmerpavel-beep/Acceptance-Facility-Management-System
+    name: acceptance-facility-management-system
+    runtime: node
+    repo: https://github.com/Slavik993/Acceptance-Facility-Management-System
     branch: main
-    region: frankfurt
+    # Регион обязан совпадать с регионом базы: внутренний адрес PostgreSQL
+    # доступен только сервисам того же региона.
+    region: oregon
     plan: free
-    rootDir: apps/api
-    healthCheckPath: /
-    buildCommand: corepack enable && pnpm install && pnpm --filter @priyomka/api exec prisma generate && pnpm --filter @priyomka/api run build
+    # Корень репозитория: pnpm-воркспейс разворачивается целиком.
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @priyomka/api exec prisma generate && pnpm --filter @priyomka/api run build
     startCommand: pnpm --filter @priyomka/api run migrate:deploy && pnpm --filter @priyomka/api run start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
+      # Внутренний адрес базы Render. Пароль лежит в репозитории — смените
+      # его в панели Render и храните новый только в переменных сервиса.
       - key: DATABASE_URL
         value: postgresql://priyomka_db_user:euRtl4m4wY61QfIYQdZUTO3EuKTVg2CG@dpg-dbg7vuavcj2c73belfeg-a/priyomka_db
+      # Файлы на бесплатном плане живут в эфемерной файловой системе и
+      # исчезают при пересоздании инстанса.
       - key: STORAGE_DIR
-        value: /data/files
-    disks:
-      - name: api-files
-        mountPath: /data
-        sizeGB: 1
+        value: /tmp/storage
+      - key: WEB_ORIGIN
+        value: https://priyomka-web.onrender.com
+
+  # ============================================
+  # Веб-клиент (сборка vite + nginx)
+  # ============================================
+  - type: web
+    name: priyomka-web
+    runtime: docker
+    repo: https://github.com/Slavik993/Acceptance-Facility-Management-System
+    branch: main
+    region: oregon
+    plan: free
+    # Контекст сборки — корень репозитория: образ собирает воркспейс целиком.
+    dockerfilePath: ./apps/web/Dockerfile
+    dockerContext: .
+    envVars:
+      # Адрес API для прокси. Внутренний адрес недоступен: статику и nginx
+      # обслуживают публичные сервисы, поэтому проксируем по публичному URL.
+      - key: API_UPSTREAM
+        value: https://acceptance-facility-management-system.onrender.com

@@ -44,9 +44,11 @@ import { FileStorage, LocalFileStorage } from "./common/file-storage";
 import { FeedbackService } from "./feedback/feedback.service";
 import { FeedbackController } from "./feedback/feedback.controller";
 import { FeedbackExportController } from "./feedback/feedback-export.controller";
+import { HealthController } from "./health.controller";
 
 @Module({
   controllers: [
+    HealthController,
     AuthController, ProjectsController, EstimatesController,
     SummaryController, DirectoryController, MeasureController, StagesController,
     AcceptanceController, ExpensesController, ActsController,

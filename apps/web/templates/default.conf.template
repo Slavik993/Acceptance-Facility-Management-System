@@ -1,0 +1,24 @@
+server {
+  # Порт 10000 — умолчание Render: контейнер на площадке отвечает на нём,
+  # и `EXPOSE` в образе совпадает с тем, куда стучится край.
+  listen 10000;
+  server_name _;
+  root /usr/share/nginx/html;
+
+  # Клиент и API выглядят как один источник: кука сессии httpOnly
+  # и SameSite=Lax, кросс-доменно браузер её не отдаст.
+  location /api/ {
+    # Адрес API подставляется переменной окружения при старте контейнера:
+    # на стенде это имя сервиса compose, на Render — публичный адрес API.
+    proxy_pass ${API_UPSTREAM}/;
+    # Host — адрес API, а не веб-узла: край Render разбирает сервис по имени
+    # в Host, и с чужим именем ответ не находится.
+    proxy_set_header Host $proxy_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}

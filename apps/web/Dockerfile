@@ -15,5 +15,9 @@ RUN pnpm --filter @priyomka/web run build
 
 FROM nginx:1.27-alpine AS runtime
 COPY --from=build /repo/apps/web/dist /usr/share/nginx/html
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+# Конфигурация — шаблон: адрес API подставляется при старте контейнера.
+COPY apps/web/templates/default.conf.template /etc/nginx/templates/default.conf.template
+# Подставляется только API_UPSTREAM: переменные самого nginx ($host, $uri)
+# остаются нетронутыми.
+ENV NGINX_ENVSUBST_FILTER="^(API_UPSTREAM)$"
+EXPOSE 10000

@@ -57,7 +57,7 @@ model DocumentTemplate {
   id        String           @id @default(uuid())
   orgId     String
   name      String
-  kind      TemplateKind     @default("CONTRACT")
+  kind      TemplateKind     @default(CONTRACT)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
   clauses   DocumentClause[]
@@ -229,7 +229,7 @@ model Project {
   address           String
   clientId          String
   foremanId         String?
-  status            ProjectStatus     @default("NEW")
+  status            ProjectStatus     @default(NEW)
   /// Чего ждём при статусе «Ждёт ответа»: что и от кого, до 140 знаков
   /// (этап Э8, ДР-4). Обязательно при этом статусе и очищается со сменой
   /// статуса — прежний текст остаётся в журнале. Видно всем ролям объекта,
@@ -415,7 +415,7 @@ model Worker {
   id           String            @id @default(uuid())
   orgId        String
   name         String
-  kind         WorkerKind        @default("BRIGADE")
+  kind         WorkerKind        @default(BRIGADE)
   /// Ставка по умолчанию в копейках за единицу; необязательна, поскольку
   /// начисление всегда идёт по ставке позиции сметы, а не по этой.
   defaultRate  BigInt?
@@ -494,7 +494,7 @@ model MeasureRoom {
   projectId        String
   /// Набор, к которому относится помещение. Значение по умолчанию делает
   /// миграцию безоговорочной: всё, что уже обмерено, — обмер начальный.
-  set              MeasureSet       @default("INITIAL")
+  set              MeasureSet       @default(INITIAL)
   name             String
   order            Int
   /// Тысячные доли единицы, как количества сметы: 18,40 м² → 18400.
@@ -546,7 +546,7 @@ model MeasureOpening {
 model MeasurePlan {
   id           String     @id @default(uuid())
   projectId    String
-  set          MeasureSet @default("INITIAL")
+  set          MeasureSet @default(INITIAL)
   storageKey   String     @unique
   fileName     String
   contentType  String
@@ -730,7 +730,7 @@ model AcceptancePhoto {
 model MaterialExpense {
   id            String           @id @default(uuid())
   projectId     String
-  status        ExpenseStatus    @default("DRAFT")
+  status        ExpenseStatus    @default(DRAFT)
   kind          ExpenseKind
   /// Копейки целым числом, как все деньги продукта (БП-08).
   amount        BigInt
@@ -783,7 +783,7 @@ model Tranche {
   number         Int
   /// Копейки. Сумма платежа клиента по этому траншу.
   amount         BigInt
-  status         TrancheStatus     @default("OPEN")
+  status         TrancheStatus     @default(OPEN)
   openedAt       DateTime          @default(now())
   closedAt       DateTime?
   paidAt         DateTime?
@@ -882,8 +882,8 @@ model Lead {
   /// Адрес объекта со слов обратившегося. Нужен при превращении в объект.
   address        String?
   note           String?
-  stage          LeadStage    @default("FIRST_CONTACT")
-  outcome        LeadOutcome  @default("OPEN")
+  stage          LeadStage    @default(FIRST_CONTACT)
+  outcome        LeadOutcome  @default(OPEN)
   /// Причина отказа. Заполняется вместе с outcome = LOST и только с ним.
   lostReason     String?
   /// Дата отказа. От неё отсчитывается срок хранения персональных данных
@@ -962,7 +962,7 @@ model Feedback {
   screenshotSize Int?
   severityAuto   FeedbackSeverity
   severity       FeedbackSeverity
-  status         FeedbackStatus   @default("NEW")
+  status         FeedbackStatus   @default(NEW)
   note           String?
   resolvedAt     DateTime?
   organization   Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
