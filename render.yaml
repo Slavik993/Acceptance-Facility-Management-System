@@ -1,0 +1,40 @@
+services:
+  # ============================================
+  # PostgreSQL база данных
+  # ============================================
+  - type: postgres
+    name: priyomka-db
+    plan: free
+    ipAllowList: []
+    databaseName: priyomka
+    user: priyomka
+
+  # ============================================
+  # API (NestJS + Prisma)
+  # ============================================
+  - type: web
+    name: priyomka-api
+    runtime: docker
+    repo: https://github.com/klemmerpavel-beep/Acceptance-Facility-Management-System
+    branch: main
+    region: frankfurt  # ближайший регион к России
+    plan: free
+    rootDir: apps/api
+    healthCheckPath: /
+    buildCommand: corepack enable && pnpm install && pnpm --filter @priyomka/api exec prisma generate && pnpm --filter @priyomka/api run build
+    startCommand: pnpm --filter @priyomka/api run migrate:deploy && pnpm --filter @priyomka/api run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: priyomka-db
+          property: connectionString
+      - key: STORAGE_DIR
+        value: /data/files
+    disks:
+      - name: api-files
+        mountPath: /data
+        sizeGB: 1
