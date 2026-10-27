@@ -21,7 +21,7 @@ services:
       - key: PORT
         value: 3000
       - key: DATABASE_URL
-        value: postgresql://priyomka:PASSWORD@DB_HOST:5432/priyomka  # замените после создания БД
+        value: postgresql://priyomka_db_user:euRtl4m4wY61QfIYQdZUTO3EuKTVg2CG@dpg-dbg7vuavcj2c73belfeg-a/priyomka_db
       - key: STORAGE_DIR
         value: /data/files
     disks:
