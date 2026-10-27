@@ -1,23 +1,15 @@
 services:
   # ============================================
-  # PostgreSQL база данных
-  # ============================================
-  - type: postgres
-    name: priyomka-db
-    plan: free
-    ipAllowList: []
-    databaseName: priyomka
-    user: priyomka
-
-  # ============================================
   # API (NestJS + Prisma)
   # ============================================
+  # ВАЖНО: сначала создайте PostgreSQL вручную через UI Render,
+  # затем скопируйте Internal Database URL и вставьте в env переменные сервиса
   - type: web
     name: priyomka-api
     runtime: docker
     repo: https://github.com/klemmerpavel-beep/Acceptance-Facility-Management-System
     branch: main
-    region: frankfurt  # ближайший регион к России
+    region: frankfurt
     plan: free
     rootDir: apps/api
     healthCheckPath: /
@@ -29,9 +21,7 @@ services:
       - key: PORT
         value: 3000
       - key: DATABASE_URL
-        fromDatabase:
-          name: priyomka-db
-          property: connectionString
+        value: postgresql://priyomka:PASSWORD@DB_HOST:5432/priyomka  # замените после создания БД
       - key: STORAGE_DIR
         value: /data/files
     disks:
