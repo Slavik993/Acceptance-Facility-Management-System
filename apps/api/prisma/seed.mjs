@@ -45,6 +45,10 @@ const owner = await prisma.user.upsert({
   where: { orgId_email: { orgId: org.id, email: "owner@dolgiy.studio" } },
   update: { name: "Роман Дементьев", phone: "+79000000000" },
   create: {
+    /* Идентификатор задан явно: на стенде есть быстрый вход по dev-токену,
+       и он открывает приложение от этого человека — его идентификатор
+       должен существовать в базе. */
+    id: "00000000-0000-4000-8000-000000000002",
     orgId: org.id, role: Role.OWNER, name: "Роман Дементьев",
     email: "owner@dolgiy.studio", phone: "+79000000000",
   },

@@ -28,8 +28,15 @@ services:
     dockerContext: .
     healthCheckPath: /health
     envVars:
+      # Стендовый режим: кода подтверждения на площадке пока нет, отправитель
+      # сообщений подключается к пилоту позже, поэтому код возвращается в
+      # ответе и показывается на экране (П-28). С NODE_ENV=production сервер
+      # не запускается: эхо и промышленный режим несовместимы.
+      # Когда отправитель подключён — NODE_ENV=production и AUTH_ECHO снять.
       - key: NODE_ENV
-        value: production
+        value: development
+      - key: AUTH_ECHO
+        value: "1"
       # Внутренний адрес базы Render. Пароль лежит в репозитории — смените
       # его в панели Render и храните новый только в переменных сервиса.
       - key: DATABASE_URL
