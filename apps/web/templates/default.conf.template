@@ -5,15 +5,26 @@ server {
   server_name _;
   root /usr/share/nginx/html;
 
+  # DNS-resolver для Render: позволяет nginx обновлять IP при каждом
+  # запросе, а не кэшировать старый адрес upstream-сервиса.
+  resolver 169.254.169.253 valid=30s;
+  resolver_timeout 5s;
+
   # Клиент и API выглядят как один источник: кука сессии httpOnly
   # и SameSite=Lax, кросс-доменно браузер её не отдаст.
   location /api/ {
     # Адрес API подставляется переменной окружения при старте контейнера:
     # на стенде это имя сервиса compose, на Render — публичный адрес API.
     proxy_pass ${API_UPSTREAM}/;
-    # Host — адрес API, а не веб-узла: край Render разбирает сервис по имени
+
+    # TLS к upstream-у: Render раздаёт много сервисов на одних IP и требует
+    # SNI (proxy_ssl_server_name), иначе рукопожатие падает с alert 40.
+    proxy_ssl_server_name on;
+    proxy_ssl_name priyomka-api.onrender.com;
+
+    # Host — адрес API, а не веб-узла: Render разбирает сервис по имени
     # в Host, и с чужим именем ответ не находится.
-    proxy_set_header Host $proxy_host;
+    proxy_set_header Host priyomka-api.onrender.com;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
   }
