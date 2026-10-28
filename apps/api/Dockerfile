@@ -24,4 +24,4 @@ ENV PORT=10000
 COPY --from=build /repo /repo
 EXPOSE 10000
 # Миграции применяются перед запуском: база поднимается с нуля одной командой.
-CMD ["sh", "-c", "pnpm --filter @priyomka/api run migrate:deploy && pnpm --filter @priyomka/api run start"]
+CMD ["sh", "-c", "pnpm --filter @priyomka/api run db:push && pnpm --filter @priyomka/api run start"]

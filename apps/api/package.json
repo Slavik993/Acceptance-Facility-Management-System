@@ -7,6 +7,7 @@
     "start": "node dist/apps/api/src/main.js",
     "prisma:generate": "prisma generate",
     "migrate:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push --force-reset",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run --passWithNoTests"
   },
