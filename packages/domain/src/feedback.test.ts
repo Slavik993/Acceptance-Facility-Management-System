@@ -4,7 +4,7 @@ import {
   FEEDBACK_STATUSES, FEEDBACK_STATUS_LABEL, FEEDBACK_TEXT_HAS_CONTACTS, FEEDBACK_TEXT_MAX,
   FEEDBACK_TEXT_TOO_LONG, FEEDBACK_TEXT_TOO_SHORT, FEEDBACK_KIND_UNKNOWN, CLOSED_FEEDBACK_STATUSES,
   feedbackAutoSeverity, feedbackDevice, feedbackHasContacts, feedbackObjectCode, feedbackRouteTemplate,
-  isFeedbackKind, isFeedbackSeverity, isFeedbackStatus, parseViewportWidth, prepareFeedback,
+  isFeedbackKind, parseViewportWidth, prepareFeedback,
   type FeedbackInput,
 } from "./feedback.js";
 
@@ -36,10 +36,6 @@ describe("замечания: перечни", () => {
   it("проверки перечней не пропускают чужое", () => {
     expect(isFeedbackKind("WORKS")).toBe(true);
     expect(isFeedbackKind("works")).toBe(false);
-    expect(isFeedbackSeverity("CRITICAL")).toBe(true);
-    expect(isFeedbackSeverity(1)).toBe(false);
-    expect(isFeedbackStatus("DONE")).toBe(true);
-    expect(isFeedbackStatus("FIXED")).toBe(false);
   });
 });
 

@@ -1,4 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -15,7 +17,8 @@ import { describe, expect, it } from "vitest";
  * объявления: ни продуктом, ни своим модулем. Проверка тестом не в счёт —
  * тест проверяет правило, а не пользуется им.
  */
-const КОРЕНЬ = new URL("../../../", import.meta.url).pathname;
+const __ФАЙЛ = fileURLToPath(import.meta.url);
+const КОРЕНЬ = join(dirname(__ФАЙЛ), "../../../");
 const исходники = (путь: string): string[] =>
   readdirSync(`${КОРЕНЬ}${путь}`, { withFileTypes: true }).flatMap((запись) => {
     const полный = `${путь}/${запись.name}`;

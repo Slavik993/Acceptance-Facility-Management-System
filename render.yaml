@@ -5,25 +5,27 @@
 # статику и проксирует /api на API. Так кука сессии (httpOnly, SameSite=Lax)
 # остаётся для одного домена и не требует CORS.
 #
-# Сервисы созданы вручную в панели Render (см. DEPLOY_RENDER.md). Файл
-# описывает их настройки и служит опорой при пересоздании.
+# Оба сервиса — Docker: образ сам собирает приложение и запускает его, а
+# миграции базы применяются перед стартом. Настройки сервисов на Render
+# меняются только здесь: после правки файла нажмите "Manual sync" у
+# Blueprint (см. DEPLOY_RENDER.md).
 # ============================================
 services:
   # ============================================
-  # API (NestJS + Prisma)
+  # API (NestJS + Prisma + Fastify)
   # ============================================
   - type: web
-    name: acceptance-facility-management-system
-    runtime: node
+    name: priyomka-api
+    runtime: docker
     repo: https://github.com/Slavik993/Acceptance-Facility-Management-System
     branch: main
     # Регион обязан совпадать с регионом базы: внутренний адрес PostgreSQL
     # доступен только сервисам того же региона.
     region: oregon
     plan: free
-    # Корень репозитория: pnpm-воркспейс разворачивается целиком.
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @priyomka/api exec prisma generate && pnpm --filter @priyomka/api run build
-    startCommand: pnpm --filter @priyomka/api run migrate:deploy && pnpm --filter @priyomka/api run start
+    # Контекст сборки — корень репозитория: образ собирает воркспейс целиком.
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -49,11 +51,10 @@ services:
     branch: main
     region: oregon
     plan: free
-    # Контекст сборки — корень репозитория: образ собирает воркспейс целиком.
     dockerfilePath: ./apps/web/Dockerfile
     dockerContext: .
     envVars:
       # Адрес API для прокси. Внутренний адрес недоступен: статику и nginx
       # обслуживают публичные сервисы, поэтому проксируем по публичному URL.
       - key: API_UPSTREAM
-        value: https://acceptance-facility-management-system.onrender.com
+        value: https://priyomka-api.onrender.com

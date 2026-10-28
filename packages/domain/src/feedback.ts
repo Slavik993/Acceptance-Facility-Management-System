@@ -67,17 +67,12 @@ export const CLOSED_FEEDBACK_STATUSES: ReadonlySet<FeedbackStatus> = new Set<Fee
 
 export const isFeedbackKind = (value: unknown): value is FeedbackKind =>
   typeof value === "string" && (FEEDBACK_KINDS as readonly string[]).includes(value);
-export const isFeedbackSeverity = (value: unknown): value is FeedbackSeverity =>
-  typeof value === "string" && (FEEDBACK_SEVERITIES as readonly string[]).includes(value);
-export const isFeedbackStatus = (value: unknown): value is FeedbackStatus =>
-  typeof value === "string" && (FEEDBACK_STATUSES as readonly string[]).includes(value);
 
 // ───────────────────────────── Пределы и тексты ──────────────────────────
 
 /** Пределы текста — те же, что у приёмника демонстрации (`12_FEEDBACK.md`). */
 export const FEEDBACK_TEXT_MIN = 5;
 export const FEEDBACK_TEXT_MAX = 4000;
-export const FEEDBACK_NOTE_MAX = 2000;
 /** Снимок экрана — до 5 МБ: снимок окна телефона весит 0,3—1,5 МБ, с запасом втрое. */
 export const FEEDBACK_SCREENSHOT_MAX_BYTES = 5 * 1024 * 1024;
 /** Раздел и вкладка — подписи интерфейса, объект — код вида `R-99`. */

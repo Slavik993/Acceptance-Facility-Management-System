@@ -4,23 +4,23 @@ FROM node:22-alpine AS build
 RUN corepack enable
 WORKDIR /repo
 
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json ./
-COPY packages/domain/package.json    packages/domain/
-COPY packages/contracts/package.json packages/contracts/
-COPY packages/ui/package.json        packages/ui/
-COPY apps/api/package.json           apps/api/
-RUN pnpm install --frozen-lockfile --filter @priyomka/api...
+# Клиент Prisma генерируется отдельной командой ниже, поэтому штатный
+# postinstall при установке не нужен — и не должен спотыкаться о схему.
+ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
 
-COPY packages ./packages
-COPY apps/api ./apps/api
-RUN pnpm --filter @priyomka/api exec prisma generate \
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @priyomka/api run prisma:generate \
  && pnpm --filter @priyomka/api run build
 
 FROM node:22-alpine AS runtime
 RUN corepack enable
 WORKDIR /repo
 ENV NODE_ENV=production
+# Render задаёт PORT=10000 и направляет на этот порт трафик; приложение
+# слушает переменную PORT. На стенде порт задаёт compose.
+ENV PORT=10000
 COPY --from=build /repo /repo
-EXPOSE 3000
+EXPOSE 10000
 # Миграции применяются перед запуском: база поднимается с нуля одной командой.
 CMD ["sh", "-c", "pnpm --filter @priyomka/api run migrate:deploy && pnpm --filter @priyomka/api run start"]

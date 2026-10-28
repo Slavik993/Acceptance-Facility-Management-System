@@ -8,7 +8,7 @@ CREATE TABLE "organizations" (
     "email" TEXT,
     "requisites" TEXT,
     "logoKey" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -17,8 +17,8 @@ CREATE TABLE "document_templates" (
     "orgId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "kind" TEXT NOT NULL DEFAULT 'CONTRACT',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP NOT NULL,
     CONSTRAINT "document_templates_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE "estimate_blueprints" (
     "name" TEXT NOT NULL,
     "sourceCode" TEXT,
     "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "estimate_blueprints_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "estimate_blueprints_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -72,22 +72,6 @@ CREATE TABLE "blueprint_items" (
 );
 
 -- CreateTable
-CREATE TABLE "users" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "orgId" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT,
-    "phone" TEXT,
-    "clientId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "revokedAt" DATETIME,
-    "lastSeenAt" DATETIME,
-    CONSTRAINT "users_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "users_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- CreateTable
 CREATE TABLE "clients" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "orgId" TEXT NOT NULL,
@@ -100,6 +84,22 @@ CREATE TABLE "clients" (
 );
 
 -- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "orgId" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT,
+    "phone" TEXT,
+    "clientId" TEXT,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "revokedAt" TIMESTAMP,
+    "lastSeenAt" TIMESTAMP,
+    CONSTRAINT "users_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "users_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
 CREATE TABLE "projects" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "orgId" TEXT NOT NULL,
@@ -109,11 +109,11 @@ CREATE TABLE "projects" (
     "foremanId" TEXT,
     "status" TEXT NOT NULL DEFAULT 'NEW',
     "waitingFor" TEXT,
-    "startedAt" DATETIME,
-    "deadline" DATETIME,
+    "startedAt" TIMESTAMP,
+    "deadline" TIMESTAMP,
     "keysCount" INTEGER NOT NULL DEFAULT 0,
     "supervisionShare" INTEGER NOT NULL DEFAULT 1200,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "projects_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "projects_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "projects_foremanId_fkey" FOREIGN KEY ("foremanId") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -135,7 +135,7 @@ CREATE TABLE "estimates" (
     "supervisionShare" INTEGER NOT NULL DEFAULT 1200,
     "declaredWorksTotal" BIGINT,
     "isLocked" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "estimates_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -164,7 +164,7 @@ CREATE TABLE "estimate_items" (
     "unitWage" BIGINT NOT NULL DEFAULT 0,
     "sourceRow" INTEGER,
     "roomId" TEXT,
-    "removedAt" DATETIME,
+    "removedAt" TIMESTAMP,
     CONSTRAINT "estimate_items_estimateId_fkey" FOREIGN KEY ("estimateId") REFERENCES "estimates" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "estimate_items_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "estimate_sections" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "estimate_items_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "units" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -190,7 +190,7 @@ CREATE TABLE "estimate_imports" (
     "estimateId" TEXT NOT NULL,
     "fileName" TEXT NOT NULL,
     "importedById" TEXT,
-    "importedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "importedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "positions" INTEGER NOT NULL,
     "sectionsTotal" INTEGER NOT NULL,
     "computedWorksTotal" BIGINT NOT NULL,
@@ -216,10 +216,10 @@ CREATE TABLE "auth_tokens" (
     "userId" TEXT NOT NULL,
     "tokenHash" TEXT NOT NULL,
     "purpose" TEXT NOT NULL,
-    "expiresAt" DATETIME NOT NULL,
-    "usedAt" DATETIME,
+    "expiresAt" TIMESTAMP NOT NULL,
+    "usedAt" TIMESTAMP,
     "attempts" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "auth_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -228,8 +228,8 @@ CREATE TABLE "sessions" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "tokenHash" TEXT NOT NULL,
-    "expiresAt" DATETIME NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -243,7 +243,7 @@ CREATE TABLE "audit_log" (
     "field" TEXT NOT NULL,
     "oldValue" TEXT,
     "newValue" TEXT,
-    "at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "audit_log_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "audit_log_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -259,7 +259,7 @@ CREATE TABLE "measure_rooms" (
     "floorPerimeter" BIGINT NOT NULL,
     "ceilingPerimeter" BIGINT NOT NULL,
     "height" BIGINT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "measure_rooms_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -284,7 +284,7 @@ CREATE TABLE "measure_plans" (
     "contentType" TEXT NOT NULL,
     "byteSize" INTEGER NOT NULL,
     "uploadedById" TEXT,
-    "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "uploadedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "measure_plans_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "measure_plans_uploadedById_fkey" FOREIGN KEY ("uploadedById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -295,8 +295,8 @@ CREATE TABLE "work_stages" (
     "projectId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "order" INTEGER NOT NULL,
-    "startsOn" DATETIME NOT NULL,
-    "endsOn" DATETIME NOT NULL,
+    "startsOn" TIMESTAMP NOT NULL,
+    "endsOn" TIMESTAMP NOT NULL,
     "progress" INTEGER NOT NULL DEFAULT 0,
     "sectionId" TEXT,
     "brigadeId" TEXT,
@@ -312,7 +312,7 @@ CREATE TABLE "acceptance_batches" (
     "sectionId" TEXT NOT NULL,
     "brigadeId" TEXT NOT NULL,
     "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "comment" TEXT,
     "trancheId" TEXT,
     CONSTRAINT "acceptance_batches_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
@@ -331,7 +331,7 @@ CREATE TABLE "acceptances" (
     "reason" TEXT,
     "reversesId" TEXT,
     "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "acceptances_batchId_fkey" FOREIGN KEY ("batchId") REFERENCES "acceptance_batches" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "acceptances_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "estimate_items" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "acceptances_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
@@ -345,7 +345,7 @@ CREATE TABLE "wage_accruals" (
     "brigadeId" TEXT NOT NULL,
     "unitWage" BIGINT NOT NULL,
     "amount" BIGINT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "wage_accruals_acceptanceId_fkey" FOREIGN KEY ("acceptanceId") REFERENCES "acceptances" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "wage_accruals_brigadeId_fkey" FOREIGN KEY ("brigadeId") REFERENCES "workers" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -359,7 +359,7 @@ CREATE TABLE "acceptance_photos" (
     "contentType" TEXT NOT NULL,
     "byteSize" INTEGER NOT NULL,
     "uploadedById" TEXT,
-    "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "uploadedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "acceptance_photos_batchId_fkey" FOREIGN KEY ("batchId") REFERENCES "acceptance_batches" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "acceptance_photos_uploadedById_fkey" FOREIGN KEY ("uploadedById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -373,7 +373,7 @@ CREATE TABLE "material_expenses" (
     "amount" BIGINT NOT NULL,
     "reimbursable" BOOLEAN NOT NULL DEFAULT true,
     "seller" TEXT NOT NULL,
-    "spentAt" DATETIME NOT NULL,
+    "spentAt" TIMESTAMP NOT NULL,
     "sectionId" TEXT,
     "note" TEXT,
     "storageKey" TEXT NOT NULL,
@@ -381,9 +381,9 @@ CREATE TABLE "material_expenses" (
     "contentType" TEXT NOT NULL,
     "byteSize" INTEGER NOT NULL,
     "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "confirmedById" TEXT,
-    "confirmedAt" DATETIME,
+    "confirmedAt" TIMESTAMP,
     CONSTRAINT "material_expenses_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "material_expenses_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "estimate_sections" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "material_expenses_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
@@ -397,13 +397,13 @@ CREATE TABLE "tranches" (
     "number" INTEGER NOT NULL,
     "amount" BIGINT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'OPEN',
-    "openedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "closedAt" DATETIME,
-    "paidAt" DATETIME,
-    "signedAt" DATETIME,
+    "openedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "closedAt" TIMESTAMP,
+    "paidAt" TIMESTAMP,
+    "signedAt" TIMESTAMP,
     "signedScanKey" TEXT,
     "signedScanType" TEXT,
-    "signedScanAt" DATETIME,
+    "signedScanAt" TIMESTAMP,
     "comment" TEXT,
     "createdById" TEXT,
     CONSTRAINT "tranches_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
@@ -415,12 +415,12 @@ CREATE TABLE "tranche_payments" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "trancheId" TEXT NOT NULL,
     "amount" BIGINT NOT NULL,
-    "paidOn" DATETIME NOT NULL,
+    "paidOn" TIMESTAMP NOT NULL,
     "reason" TEXT,
     "reversalOfId" TEXT,
     "comment" TEXT,
     "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "tranche_payments_trancheId_fkey" FOREIGN KEY ("trancheId") REFERENCES "tranches" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "tranche_payments_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "tranche_payments_reversalOfId_fkey" FOREIGN KEY ("reversalOfId") REFERENCES "tranche_payments" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
@@ -449,16 +449,16 @@ CREATE TABLE "leads" (
     "stage" TEXT NOT NULL DEFAULT 'FIRST_CONTACT',
     "outcome" TEXT NOT NULL DEFAULT 'OPEN',
     "lostReason" TEXT,
-    "lostAt" DATETIME,
-    "anonymizedAt" DATETIME,
+    "lostAt" TIMESTAMP,
+    "anonymizedAt" TIMESTAMP,
     "repairTypeId" TEXT,
     "area" BIGINT,
     "rateSnapshot" BIGINT,
     "spreadSnapshot" INTEGER,
     "clientId" TEXT,
     "projectId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP NOT NULL,
     CONSTRAINT "leads_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "leads_repairTypeId_fkey" FOREIGN KEY ("repairTypeId") REFERENCES "repair_types" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "leads_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
@@ -471,9 +471,9 @@ CREATE TABLE "lead_tasks" (
     "orgId" TEXT NOT NULL,
     "leadId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "dueOn" DATETIME NOT NULL,
-    "doneAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dueOn" TIMESTAMP NOT NULL,
+    "doneAt" TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "lead_tasks_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "lead_tasks_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "leads" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -482,8 +482,8 @@ CREATE TABLE "lead_tasks" (
 CREATE TABLE "feedback" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "orgId" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP NOT NULL,
     "kind" TEXT NOT NULL,
     "authorRole" TEXT NOT NULL,
     "routeTemplate" TEXT NOT NULL,
@@ -500,7 +500,7 @@ CREATE TABLE "feedback" (
     "severity" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'NEW',
     "note" TEXT,
-    "resolvedAt" DATETIME,
+    "resolvedAt" TIMESTAMP,
     CONSTRAINT "feedback_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organizations" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -513,7 +513,7 @@ CREATE TABLE "project_files" (
     "contentType" TEXT NOT NULL,
     "byteSize" INTEGER NOT NULL,
     "uploadedById" TEXT,
-    "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "uploadedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "description" TEXT,
     CONSTRAINT "project_files_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "project_files_uploadedById_fkey" FOREIGN KEY ("uploadedById") REFERENCES "users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -538,13 +538,13 @@ CREATE INDEX "blueprint_items_blueprintId_order_idx" ON "blueprint_items"("bluep
 CREATE INDEX "blueprint_items_sectionId_order_idx" ON "blueprint_items"("sectionId", "order");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "clients_orgId_code_key" ON "clients"("orgId", "code");
+
+-- CreateIndex
 CREATE INDEX "users_orgId_role_idx" ON "users"("orgId", "role");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_orgId_email_key" ON "users"("orgId", "email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "clients_orgId_code_key" ON "clients"("orgId", "code");
 
 -- CreateIndex
 CREATE INDEX "projects_orgId_status_idx" ON "projects"("orgId", "status");
