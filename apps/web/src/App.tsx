@@ -129,6 +129,22 @@ export function App(): React.JSX.Element {
 
   const load = (): void => {
     void (async () => {
+      /* Демо-режим: если пользователь нажал «Посмотреть демо»,
+         подхватываем данные из sessionStorage вместо запроса к API. */
+      const demoFlag = sessionStorage.getItem("priyomka-demo");
+      if (demoFlag === "1") {
+        const user = JSON.parse(sessionStorage.getItem("priyomka-me") ?? "{}");
+        const projects = JSON.parse(sessionStorage.getItem("priyomka-projects") ?? "[]");
+        const units: string[] = [];
+        setSection("projects");
+        применитьАдрес(window.location.hash, {
+          user, projects, текущий: null, заменить: заменитьАдрес, setSection, setOpened, setВкладка, setОтбор,
+        });
+        setState({ kind: "signed", user, projects, units });
+        sessionStorage.removeItem("priyomka-demo");
+        return;
+      }
+
       /* Вход устанавливается ответом о самом вошедшем и ничем больше.
          
          Прежде вся загрузка стояла под одним `try`, и отказ любой

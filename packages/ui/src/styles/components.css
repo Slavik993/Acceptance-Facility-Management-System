@@ -42,6 +42,9 @@
 .btn--text      { background: transparent; color: var(--accent); padding: 0 var(--space-2); }
 .btn--text:hover:not([disabled]) { background: var(--accent-soft); }
 
+.btn--outline   { background: transparent; color: var(--accent); border-color: var(--accent); }
+.btn--outline:hover:not([disabled]) { background: var(--accent-soft); }
+
 .btn--danger    { background: var(--danger); color: var(--ink-inv); }
 
 .btn--touch     { height: var(--control-h-touch); font-size: var(--fs-h3); }

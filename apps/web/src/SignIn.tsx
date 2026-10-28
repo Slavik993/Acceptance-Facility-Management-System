@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { parsePhone } from "@priyomka/domain";
 import { confirmSmsCode, requestSmsCode, errorMessage } from "./api.js";
+import demoSnapshot from "./demo/snapshot.json";
 
 /** Токен сессии для быстрого входа в dev-режиме. */
 const DEV_SESSION_TOKEN = "dev-session-token-12345";
@@ -62,6 +63,16 @@ export function SignIn({ onSignedIn }: { onSignedIn: () => void }): React.JSX.El
     event.preventDefault();
     // Ставим куку сессии вручную — имя должно совпадать с SESSION_COOKIE в бэкенде
     document.cookie = `priyomka_session=${DEV_SESSION_TOKEN}; path=/; SameSite=Lax`;
+    onSignedIn();
+  };
+
+  /** Демо-режим: открывает интерфейс без API — для просмотра продукта. */
+  const demoLogin: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    // Сохраняю демо-данные в sessionStorage, чтобы App их подхватил
+    sessionStorage.setItem("priyomka-demo", "1");
+    sessionStorage.setItem("priyomka-me", JSON.stringify(demoSnapshot["me-owner"]));
+    sessionStorage.setItem("priyomka-projects", JSON.stringify(demoSnapshot["projects-owner"]));
     onSignedIn();
   };
 
@@ -128,6 +139,16 @@ export function SignIn({ onSignedIn }: { onSignedIn: () => void }): React.JSX.El
           <div className="signin__actions">
             <button className="btn btn--secondary" type="button" onClick={devLogin}>
               Войти как руководитель
+            </button>
+          </div>
+          {/* Разделитель */}
+          <div className="signin__divider">
+            <span>или</span>
+          </div>
+          {/* Демо-режим: без входа, для просмотра продукта */}
+          <div className="signin__actions">
+            <button className="btn btn--outline" type="button" onClick={demoLogin}>
+              Посмотреть демо
             </button>
           </div>
           {/* Тому, кому доступ не выдали, сказано, что делать. Прежде экран
