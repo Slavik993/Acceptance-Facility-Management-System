@@ -133,9 +133,10 @@ export function App(): React.JSX.Element {
          интерфейс с демо-данными. Работает даже если API недоступен. */
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("demo") === "1") {
-        const demoSnapshot = await import("./demo/snapshot.json");
-        const user = demoSnapshot["me-owner"] as CurrentUser;
-        const projects = demoSnapshot["projects-owner"] as ProjectSummary[];
+        const demoSnapshot = await import("./demo/snapshot.json") as { default: Record<string, unknown> };
+        const data = demoSnapshot.default;
+        const user = data["me-owner"] as CurrentUser;
+        const projects = data["projects-owner"] as ProjectSummary[];
         const units: string[] = [];
         setSection("projects");
         применитьАдрес(window.location.hash, {
