@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { parsePhone } from "@priyomka/domain";
 import { confirmSmsCode, requestSmsCode, errorMessage } from "./api.js";
-import demoSnapshot from "./demo/snapshot.json";
 
 /** Токен сессии для быстрого входа в dev-режиме. */
 const DEV_SESSION_TOKEN = "dev-session-token-12345";
@@ -69,11 +68,8 @@ export function SignIn({ onSignedIn }: { onSignedIn: () => void }): React.JSX.El
   /** Демо-режим: открывает интерфейс без API — для просмотра продукта. */
   const demoLogin: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    // Сохраняю демо-данные в sessionStorage, чтобы App их подхватил
-    sessionStorage.setItem("priyomka-demo", "1");
-    sessionStorage.setItem("priyomka-me", JSON.stringify(demoSnapshot["me-owner"]));
-    sessionStorage.setItem("priyomka-projects", JSON.stringify(demoSnapshot["projects-owner"]));
-    onSignedIn();
+    // Переход на ту же страницу с ?demo=1 — App подхватит это без запроса к API
+    window.location.href = window.location.pathname + "?demo=1";
   };
 
   return (

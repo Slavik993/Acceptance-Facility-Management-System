@@ -129,21 +129,29 @@ export function App(): React.JSX.Element {
 
   const load = (): void => {
     void (async () => {
-      /* Демо-режим: если пользователь нажал «Посмотреть демо»,
-         подхватываем данные из sessionStorage вместо запроса к API. */
-      const demoFlag = sessionStorage.getItem("priyomka-demo");
-      if (demoFlag === "1") {
-        const user = JSON.parse(sessionStorage.getItem("priyomka-me") ?? "{}");
-        const projects = JSON.parse(sessionStorage.getItem("priyomka-projects") ?? "[]");
+      /* Демо-режим через URL-параметр: ?demo=1 — без API, сразу показывает
+         интерфейс с демо-данными. Работает даже если API недоступен. */
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("demo") === "1") {
+        const demoSnapshot = await import("./demo/snapshot.json");
+        const user = demoSnapshot["me-owner"] as CurrentUser;
+        const projects = demoSnapshot["projects-owner"] as ProjectSummary[];
         const units: string[] = [];
         setSection("projects");
         применитьАдрес(window.location.hash, {
           user, projects, текущий: null, заменить: заменитьАдрес, setSection, setOpened, setВкладка, setОтбор,
         });
         setState({ kind: "signed", user, projects, units });
-        sessionStorage.removeItem("priyomka-demo");
         return;
       }
+
+      /* Таймаут для API-запросов: Render free tier спит, запрос может
+         висеть бесконечно. 5 секунд — достаточно для здорового сервера
+         и достаточно мало для корректного падения на заснувшем. */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const withTimeout = (promise: Promise<any>, ms: number): Promise<any> =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Promise.race([promise, new Promise<any>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))]);
 
       /* Вход устанавливается ответом о самом вошедшем и ничем больше.
          
@@ -158,13 +166,13 @@ export function App(): React.JSX.Element {
          повторили бы то же самое. */
       let user;
       try {
-        user = await fetchCurrentUser();
+        user = await withTimeout(fetchCurrentUser(), 5000);
       } catch {
         setState({ kind: "anonymous" });
         return;
       }
 
-      const projects = await fetchProjects().catch(() => []);
+      const projects = await withTimeout(fetchProjects(), 5000).catch(() => []);
       /* Справочник единиц нужен экрану импорта сметы, а импорт есть только у
          руководителя. Спрашивать его у прочих — это отказ на каждом входе:
          в журнале сервера он неотличим от попытки залезть не в своё. */
