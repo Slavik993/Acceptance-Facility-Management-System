@@ -130,7 +130,7 @@ export function App(): React.JSX.Element {
   const load = (): void => {
     void (async () => {
       /* Демо-режим через URL-параметр: ?demo=1 — без API, сразу показывает
-         интерфейс с демо-данными. Работает даже если API недоступен. */
+          интерфейс с демо-данными. Работает даже если API недоступен. */
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("demo") === "1") {
         const demoSnapshot = await import("./demo/snapshot.json") as { default: Record<string, unknown> };
@@ -143,6 +143,12 @@ export function App(): React.JSX.Element {
           user, projects, текущий: null, заменить: заменитьАдрес, setSection, setOpened, setВкладка, setОтбор,
         });
         setState({ kind: "signed", user, projects, units });
+        /* Загружаем inbox из демо-данных, если он есть. */
+        const demoInbox = data["inbox-client"] as { items: unknown[]; seenAt: string | null } | undefined;
+        if (demoInbox) {
+          setОчередьЗаказчика(demoInbox as unknown as Inbox);
+          if (demoInbox.seenAt === null) { setFirstLoginOpen(true); }
+        }
         return;
       }
 
@@ -192,9 +198,12 @@ export function App(): React.JSX.Element {
         user, projects, текущий: null, заменить: заменитьАдрес, setSection, setOpened, setВкладка, setОтбор,
       });
       setState({ kind: "signed", user, projects, units });
-  /* Заход заказчика: сперва новое с прошлой отметки, затем отметка
-          «сейчас». Порядок обязателен — обратный стёр бы новое до показа.
-          Если отметки нет вовсе — экран первого входа (ДР-11). */
+      /* Заход заказчика: сперва новое с прошлой отметки, затем отметка
+           «сейчас». Порядок обязателен — обратный стёр бы новое до показа.
+           Если отметки нет вовсе — экран первого входа (ДР-11).
+           
+           Если API не ответил (Render free tier спит), показываем пустой
+           список вместо ошибки: лучше пустота, чем сломанный экран. */
       if (user.role === "CLIENT") {
         void fetchInbox()
           .then((очередь) => {
@@ -202,7 +211,16 @@ export function App(): React.JSX.Element {
             if (очередь.seenAt === null) { setFirstLoginOpen(true); }
             else { return markInboxSeen(); }
           })
-          .catch((cause: unknown) => { setОшибкаОчереди(errorMessage(cause)); });
+          .catch((cause: unknown) => {
+            /* Таймаут или 502 от Render — не пугаем пользователя,
+               просто показываем пустую очередь. */
+            const msg = errorMessage(cause);
+            if (msg.includes("timeout") || msg.includes("502")) {
+              setОчередьЗаказчика({ today: new Date().toISOString().slice(0, 10), items: [], seenAt: null });
+            } else {
+              setОшибкаОчереди(msg);
+            }
+          });
       }
     })();
   };
