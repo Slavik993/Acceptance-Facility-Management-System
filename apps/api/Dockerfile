@@ -9,6 +9,7 @@ WORKDIR /repo
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
 
 COPY . .
+RUN pnpm approve-builds --all
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @priyomka/api run prisma:generate \
  && pnpm --filter @priyomka/api run build
