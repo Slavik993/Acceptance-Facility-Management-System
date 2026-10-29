@@ -8,6 +8,7 @@
  */
 import { chromium } from "playwright-core";
 import { launchOptions, browserSource } from "./browser.mjs";
+import { fileURLToPath } from "node:url";
 import { mkdirSync, readFileSync } from "node:fs";
 
 const BASE = process.env.BASE ?? "http://127.0.0.1:5173";
@@ -18,7 +19,7 @@ const SHOTS = process.env.SHOTS ?? "/tmp/shots";
 // Путь считается от самого скрипта — той же идиомой, что в seed-estimate.mjs
 // и capture-demo.mjs. Абсолютный путь годился ровно для одной машины.
 const FIXTURE = process.env["FIXTURE"]
-  ?? new URL("../packages/importer/fixtures/smeta-obezlichennaya.xlsx", import.meta.url).pathname;
+  ?? fileURLToPath(new URL("../packages/importer/fixtures/smeta-obezlichennaya.xlsx", import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
 
 const problems = [];

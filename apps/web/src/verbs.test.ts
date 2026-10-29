@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { ГЛАГОЛЫ } from "./verbs.js";
@@ -16,7 +17,7 @@ import { ГЛАГОЛЫ } from "./verbs.js";
  * вид, в каком его пишет разметка; слово в русских кавычках внутри
  * комментария правилом не затрагивается.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 const СВОЙ = "verbs.ts";
 
 /**

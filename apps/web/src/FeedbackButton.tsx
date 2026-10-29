@@ -54,18 +54,6 @@ export function FeedbackButton(): React.JSX.Element {
         className={узко ? "btn btn--primary feedback__open feedback__open--icon" : "btn btn--primary feedback__open"}
         aria-label={узко ? "Замечание" : "Замечание о платформе"}
         onClick={() => { setОткрыт(true); }}
-        style={{
-          position: "fixed",
-          bottom: узко ? "calc(var(--tabbar-h) + var(--space-3))" : "var(--space-4)",
-          right: "var(--space-4)",
-          zIndex: 90,
-          borderRadius: "var(--radius-full)",
-          width: узко ? "var(--tap-min)" : undefined,
-          height: узко ? "var(--tap-min)" : undefined,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
       >
         <svg className="icon" aria-hidden="true" style={{ width: 24, height: 24 }}>
           <use href="#i-request" />

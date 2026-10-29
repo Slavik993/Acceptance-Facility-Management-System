@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { НЕ_ЗАПОЛНЕНО } from "./empty.js";
@@ -18,7 +19,7 @@ import { НЕ_ЗАПОЛНЕНО } from "./empty.js";
  * Слово в русских кавычках внутри комментария правилом не затрагивается:
  * комментарий объясняет, а не печатается.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 const СВОЙ = "empty.ts";
 
 const экраны = readdirSync(КОРЕНЬ, { withFileTypes: true })

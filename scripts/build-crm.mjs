@@ -12,11 +12,12 @@
  * первой правке, и заказчик размечает замечания по странице, которой в
  * продукте уже нет.
  */
+import { fileURLToPath } from "node:url";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { GOOGLE_FONTS } from "./fonts.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
 const styles = join(root, "packages/ui/src/styles");
 const design = join(root, "design");
 

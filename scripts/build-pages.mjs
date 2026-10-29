@@ -14,13 +14,14 @@
  *
  * Каталог `site/` — производное, в индекс не попадает.
  */
+import { fileURLToPath } from "node:url";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { artboardPage } from "./canvas-page.mjs";
 import { своиГарнитуры } from "./fonts.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
 const demo = join(root, "apps/web/dist-demo");
 const design = join(root, "design");
 const site = join(root, "site");

@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { updateProjectStatusSchema } from "@priyomka/contracts";
@@ -68,7 +69,7 @@ describe("поле «Ждём» в контракте смены статуса"
  * Ищется обход — фраза словаря в тексте модуля экрана мимо `turn.ts`.
  */
 describe("закрытость словаря", () => {
-  const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+  const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
   const безКомментариев = (текст: string): string => текст
     .replace(/\{\/\*[\s\S]*?\*\/\}/gu, "")
     .replace(/\/\*[\s\S]*?\*\//gu, "")

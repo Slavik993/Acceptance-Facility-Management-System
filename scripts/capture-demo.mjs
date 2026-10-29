@@ -9,11 +9,12 @@
  * сервер: отсутствие внутренних величин в демонстрации — это отсутствие их
  * в настоящем ответе, а не работа интерфейса.
  */
+import { fileURLToPath } from "node:url";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const BASE = process.env.API ?? "http://127.0.0.1:3000";
-const TARGET = new URL("../apps/web/src/demo/snapshot.json", import.meta.url).pathname;
-const FIXTURE = new URL("../packages/importer/fixtures/smeta-obezlichennaya.xlsx", import.meta.url).pathname;
+const TARGET = fileURLToPath(new URL("../apps/web/src/demo/snapshot.json", import.meta.url));
+const FIXTURE = fileURLToPath(new URL("../packages/importer/fixtures/smeta-obezlichennaya.xlsx", import.meta.url));
 
 async function signIn(email) {
   const link = await fetch(`${BASE}/auth/magic-link`, {

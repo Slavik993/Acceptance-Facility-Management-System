@@ -5,13 +5,14 @@
  * сопоставление написаний единиц, импорт. Прямой записи в таблицы нет —
  * иначе стенд наполнялся бы данными, которые продукт получить не может.
  */
+import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
 import { снимокОтчёта } from "./report-photos.mjs";
 
 const BASE = process.env.API ?? "http://127.0.0.1:3000";
 const CODE = process.env.CODE ?? "R-99";
 const FILE = process.env.FIXTURE
-  ?? new URL("../packages/importer/fixtures/smeta-obezlichennaya.xlsx", import.meta.url).pathname;
+  ?? fileURLToPath(new URL("../packages/importer/fixtures/smeta-obezlichennaya.xlsx", import.meta.url));
 
 const link = await fetch(`${BASE}/auth/magic-link`, {
   method: "POST",

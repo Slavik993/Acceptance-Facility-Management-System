@@ -269,9 +269,7 @@
 /* Панель — не коробка, а раздел документа: волосяные линии сверху и снизу,
    без боковых границ и без скругления. Заливку листа получают только
    таблицы, которым нужен фон под липким заголовком. */
-.panel { border-block: 1px solid var(--line); padding: var(--space-5) var(--space-5); }
-@media (max-width: 767px) { .panel { padding: var(--space-4) var(--space-4); } }
-@media (max-width: 480px) { .panel { padding: var(--space-3) var(--space-3); } }
+.panel { border-block: 1px solid var(--line); }
 .panel--sheet { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .panel--pad   { padding: var(--space-4) 0; }
 .panel--sheet.panel--pad { padding: var(--space-4); }
@@ -381,7 +379,9 @@
   letter-spacing: var(--ls-cap); text-transform: uppercase; opacity: .78; }
 .appbar__title { margin-inline: auto; font-size: var(--fs-sm); }
 
-/* Мобильная навигация: компактная шапка. */
+/* Мобильная навигация: компактная шапка. Подпись студии на узком экране
+   остаётся: локап в две строки в шапке 52 px помещается, и в опубликованной
+   сборке «DOLGIY STUDIO» видна на всех ширинах. */
 @media (max-width: 767px) {
   .appbar {
     height: 52px;
@@ -389,7 +389,6 @@
     gap: var(--space-2);
   }
   .appbar__product { font-size: var(--fs-body); }
-  .appbar__org { display: none; }
   .appbar__mark { inline-size: 20px; block-size: 20px; }
 }
 /* Пилюли прокручиваются вбок, а не выталкивают страницу: между 768 и
@@ -1265,9 +1264,14 @@ button.appbar__link { gap: var(--space-1); border: 0; background: none;
 .signin__divider { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 0; }
 .signin__divider::before, .signin__divider::after { content: ""; flex: 1 1 0; block-size: 1px; background: var(--ink-2); opacity: 0.3; }
 .signin__divider span { font-size: var(--fs-cap); color: var(--ink-3); white-space: nowrap; }
-/* Кнопка быстрого входа в dev-режиме */
-.btn--secondary { background: var(--ink-2); color: var(--ink-1); border: 1px solid var(--ink-2); }
-.btn--secondary:hover { background: var(--ink-3); border-color: var(--ink-3); }
+/* Кнопка быстрого входа в dev-режиме.
+   Своё правило, а не переопределение `.btn--secondary`: то переопределение
+   утекало на все вторичные кнопки продукта и красило их тёмной заливкой
+   с тёмным же текстом — кнопки в очереди «Ждёт вашего действия» и в других
+   разделах становились нечитаемыми. Токен `--ink-1` в системе не введён,
+   и цвет текста на тёмной заливке не задавался вовсе. */
+.signin__dev { background: var(--ink-2); color: var(--ink-inv); border: 1px solid var(--ink-2); }
+.signin__dev:hover { background: var(--ink-3); border-color: var(--ink-3); }
 /* Надзаголовок поля: капс, как подпись «ВВЕДИТЕ НОМЕР ТЕЛЕФОНА». */
 .field__label--cap { font-family: var(--font-ui); font-size: var(--fs-cap); line-height: var(--lh-cap);
   font-weight: var(--fw-cap); letter-spacing: var(--ls-cap);
@@ -1696,6 +1700,13 @@ button.appbar__link { gap: var(--space-1); border: 0; background: none;
   line-height: var(--lh-display); font-weight: 600; color: var(--ink); }
 .statcard__value--warn { color: var(--warn); }
 .statcard__value--danger { color: var(--danger); }
+/* Денежная величина в карточке портфеля. Сумма разрядов разделена
+   неразрывным пробелом, поэтому строка не переносится и число уходило
+   за край карточки: «3 160 070,3…». Кегль течёт вместе с шириной экрана,
+   оставаясь в границах шкалы, и сумма помещается в колонку целиком. */
+.statcard--money .statcard__value {
+  font-size: clamp(var(--fs-h2), 1.9vw, var(--fs-display));
+}
 .statcard__note { grid-column: 1 / -1; font-size: var(--fs-sm); color: var(--ink-3); }
 /* Доля числа в портфеле. Знаменатель назван подписью под мерой («всего в
    портфеле 8»), поэтому дорожка обходится без оси и подписей: она отвечает
@@ -2001,6 +2012,11 @@ button.appbar__link { gap: var(--space-1); border: 0; background: none;
 .report__grid {
   display: grid; gap: var(--space-4);
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+/* На узком экране карточки отчёта идут в одну колонку: три узких плитки в
+   ряд читаются хуже, чем одна широкая. Как в опубликованной сборке. */
+@media (max-width: 767px) {
+  .report__grid { grid-template-columns: minmax(0, 1fr); }
 }
 .report__card {
   display: flex; flex-direction: column; gap: var(--space-3);

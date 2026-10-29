@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -10,7 +11,7 @@ import { describe, expect, it } from "vitest";
  * строкой в исходниках экранов — в разметке или в словаре глаголов
  * (`verbs.ts`), откуда берут подписи кнопок заведения.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 const ПАМЯТКА = readFileSync(new URL("../../../design/prorab.html", import.meta.url), "utf8");
 
 const безКомментариев = (текст: string): string => текст

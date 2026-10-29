@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -13,7 +14,7 @@ import { describe, expect, it } from "vitest";
  *
  * Проверка общая, а не именная: модуль клиента обязан быть кому-то нужен.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 
 /**
  * Точки входа и файлы, которые по устройству не импортируются по имени.

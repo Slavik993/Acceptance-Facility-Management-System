@@ -8,11 +8,12 @@
  *
  * Запускается сразу после `build-pages.mjs`, до отправки артефакта.
  */
+import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
 const site = join(root, "site");
 
 const problems = [];

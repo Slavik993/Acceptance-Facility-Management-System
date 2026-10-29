@@ -12,11 +12,12 @@
  * нет, поэтому объявления снимаются, а гарнитуры подключаются ссылкой на
  * Google Fonts — версия для артефактов её сохраняет (`fonts.mjs`).
  */
+import { fileURLToPath } from "node:url";
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { GOOGLE_FONTS } from "./fonts.mjs";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
 const assets = join(root, "apps/web/dist-demo/assets");
 
 const files = readdirSync(assets);

@@ -14,6 +14,7 @@
  * Записанное рядом разошлось бы с прогоном ровно тем же способом, каким
  * документы разошлись со сборкой.
  */
+import { fileURLToPath } from "node:url";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
@@ -681,7 +682,7 @@ const ДВОИЧНЫЕ = /\.(?:png|webp|jpe?g|gif|ico|woff2?|ttf|otf|pdf|xlsx|zi
 {
   const ExcelJS = createRequire(new URL("../packages/importer/package.json", import.meta.url))("exceljs");
   const книга = new ExcelJS.Workbook();
-  await книга.xlsx.readFile(new URL("../docs/13_FULL_AUDIT.xlsx", import.meta.url).pathname);
+  await книга.xlsx.readFile(fileURLToPath(new URL("../docs/13_FULL_AUDIT.xlsx", import.meta.url)));
   const лист = книга.getWorksheet("Реестр");
   const вКниге = new Map();
   лист?.eachRow((строка, номер) => {

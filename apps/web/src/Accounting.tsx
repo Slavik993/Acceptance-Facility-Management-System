@@ -442,7 +442,7 @@ function MoneyCard({
     ? "statcard__value"
     : tone === "warn" ? "statcard__value statcard__value--warn" : "statcard__value statcard__value--danger";
   return (
-    <div className="statcard">
+    <div className="statcard statcard--money">
       <span className="statcard__label">{label}</span>
       <span className={классЧисла}>{formatKopecks(BigInt(value))}</span>
       <span className="statcard__note">{note}</span>

@@ -133,7 +133,7 @@ export function SignIn({ onSignedIn }: { onSignedIn: () => void }): React.JSX.El
           </div>
           {/* Кнопка быстрого входа в dev-режиме */}
           <div className="signin__actions">
-            <button className="btn btn--secondary" type="button" onClick={devLogin}>
+            <button className="btn btn--secondary signin__dev" type="button" onClick={devLogin}>
               Войти как руководитель
             </button>
           </div>

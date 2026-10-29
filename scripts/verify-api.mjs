@@ -7,6 +7,7 @@
  * ответа. Здесь это делается на настоящем сервере и настоящей смете из
  * 132 позиций, а не на выдуманном объекте.
  */
+import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -639,7 +640,7 @@ check(blocked.status === 401, `верный код принят после пя�
    проверяется вторым экземпляром той же сборки: без флага и без NODE_ENV он
    обязан молчать, с флагом в промышленном режиме — не запуститься.
    -------------------------------------------------------------------------- */
-const СЕРВЕР = new URL("../apps/api/dist/apps/api/src/main.js", import.meta.url).pathname;
+const СЕРВЕР = fileURLToPath(new URL("../apps/api/dist/apps/api/src/main.js", import.meta.url));
 
 function поднятьСервер(окружение) {
   const процесс = spawn(process.execPath, [СЕРВЕР], { env: окружение, stdio: ["ignore", "pipe", "pipe"] });

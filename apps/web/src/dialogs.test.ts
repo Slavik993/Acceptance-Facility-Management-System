@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -15,7 +16,7 @@ import { describe, expect, it } from "vitest";
  * Проверяется свойство, а не список листов: модуль, объявивший роль диалога,
  * обязан позвать общий контракт и повесить его опору на сам лист.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 
 const листы = readdirSync(КОРЕНЬ)
   .filter((имя) => имя.endsWith(".tsx"))

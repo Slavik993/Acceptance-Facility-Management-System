@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { formatKopecks } from "@priyomka/ui";
 
 /**
  * Баланс контрагента в строке списка (Э7, кандидат).
@@ -7,18 +8,21 @@ import { describe, expect, it } from "vitest";
  * — начислено, оплачено, ждёт — числа с форматированием
  * — ждёт > 0 → красный, ждёт ≤ 0 → нейтральный
  * — null → прочерк
+ *
+ * Форматирование берётся то, которым печатает экран контактов
+ * (`Contacts.tsx` зовёт `formatKopecks`), а не собственная копия: своя
+ * копия проверяла саму себя и расходилась с продуктом — копейки делились
+ * на сто в одном месте и не делились в другом.
  */
-const money = (value: bigint): string =>
-  value.toLocaleString("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+const NBSP = " ";
+
+const money = (value: bigint): string => formatKopecks(value);
 
 describe("баланс контрагента", () => {
   it("форматирует деньги", () => {
-    expect(money(1234567n)).toBe("12 345,67");
-    expect(money(0n)).toBe("0,00");
-    expect(money(-50000n)).toBe("-500,00");
+    expect(money(1234567n)).toBe(`12${NBSP}345,67${NBSP}₽`);
+    expect(money(0n)).toBe(`0,00${NBSP}₽`);
+    expect(money(-50000n)).toBe(`−500,00${NBSP}₽`);
   });
 
   it("ждёт > 0 — красный тон", () => {

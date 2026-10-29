@@ -10,6 +10,7 @@
  * ExcelJS берётся зависимостью импортёра смет: новой зависимости сборка
  * не вводит.
  */
+import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 
@@ -74,5 +75,5 @@ for (const [заголовок, имя, ширины] of [
   оформить(лист, ширины);
 }
 
-await книга.xlsx.writeFile(new URL("../docs/13_FULL_AUDIT.xlsx", import.meta.url).pathname);
+await книга.xlsx.writeFile(fileURLToPath(new URL("../docs/13_FULL_AUDIT.xlsx", import.meta.url)));
 console.log(`Книга находок: ${String(реестр.length - 1)} замечаний, ${String(решения.length - 1)} решений заказчика.`);

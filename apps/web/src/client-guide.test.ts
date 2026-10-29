@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -11,7 +12,7 @@ import { describe, expect, it } from "vitest";
  * Названия вкладок набраны тегом `<b>` в HTML-файле; каждое обязано
  * стоять в списке вкладок карточки (`TABS` в `ProjectCard.tsx`).
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 const ПАМЯТКА = readFileSync(new URL("../../../design/zakazchik.html", import.meta.url), "utf8");
 
 const безКомментариев = (текст: string): string => текст

@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -21,7 +22,7 @@ import { describe, expect, it } from "vitest";
  * наполнении базы и в слепке демонстрации, и всякое другое потребовало бы
  * правки данных — то есть обратной совместимости и пересъёмки слепка.
  */
-const КОРЕНЬ = new URL("../", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("../", import.meta.url));
 const прочитать = (путь: string): string => readFileSync(`${КОРЕНЬ}${путь}`, "utf8");
 
 const МЕСТА = [

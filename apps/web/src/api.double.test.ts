@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -21,7 +22,7 @@ import { describe, expect, it } from "vitest";
  * слоя и наружу не выходит — требовать его от двойника значило бы завести
  * правило шире надобности и получать замечание на пустом месте.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 
 const исходники = readdirSync(КОРЕНЬ, { withFileTypes: true })
   .filter((узел) => узел.isFile())

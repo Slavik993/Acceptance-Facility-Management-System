@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -15,7 +16,7 @@ import { describe, expect, it } from "vitest";
  * Проверяется текст разметки, а не комментарии: в них «клиентская
  * проекция» — имя механизма из документов, а не подпись на экране.
  */
-const КОРЕНЬ = new URL("./", import.meta.url).pathname;
+const КОРЕНЬ = fileURLToPath(new URL("./", import.meta.url));
 const безКомментариев = (текст: string): string => текст
   .replace(/\{\/\*[\s\S]*?\*\/\}/gu, "")
   .replace(/\/\*[\s\S]*?\*\//gu, "")
@@ -62,7 +63,7 @@ const МНОГО = [
 ].join("|");
 const ОБХОД = new RegExp(`(?:\\$\\{[^}]+\\}|\\{[^}"]+\\})\\s+(?:${МНОГО})(?![а-яё])`, "u");
 
-const СЕРВЕР = new URL("../../api/src/", import.meta.url).pathname;
+const СЕРВЕР = fileURLToPath(new URL("../../api/src/", import.meta.url));
 const исходники = (корень: string, путь = ""): { имя: string; текст: string }[] =>
   readdirSync(`${корень}${путь}`, { withFileTypes: true }).flatMap((запись) => {
     const имя = `${путь}${запись.name}`;

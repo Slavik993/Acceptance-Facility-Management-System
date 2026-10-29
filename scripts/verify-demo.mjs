@@ -13,11 +13,12 @@
  */
 import { chromium } from "playwright-core";
 import { launchOptions } from "./browser.mjs";
+import { fileURLToPath } from "node:url";
 import { createServer } from "node:http";
 import { existsSync, readFileSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
 
-const site = new URL("../site", import.meta.url).pathname;
+const site = fileURLToPath(new URL("../site", import.meta.url));
 const PORT = Number(process.env["DEMO_PORT"] ?? 4173);
 
 if (!existsSync(join(site, "index.html"))) {

@@ -56,7 +56,7 @@ export function FirstLogin({
   };
 
   return (
-    <div className="stack stack--loose" role="dialog" aria-label="Первый вход">
+    <main className="container stack stack--loose">
       <div className="panel panel--pad">
         <h1 className="t-h2">Добро пожаловать в «Приёмку»</h1>
         {project !== null && (
@@ -113,6 +113,6 @@ export function FirstLogin({
       >
         Ещё → Как пользоваться
       </button>
-    </div>
+    </main>
   );
 }
